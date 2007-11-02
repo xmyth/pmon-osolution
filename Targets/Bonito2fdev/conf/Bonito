@@ -166,3 +166,5 @@ option FOR_GXEMUL
 select fatfs
 option FLOATINGPT
 option HAVE_XGIZ9_ROM
+select cmd_main
+option WDC_NORESET
