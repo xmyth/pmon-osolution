@@ -12,6 +12,9 @@
 #include <linux/io.h>
 #include "biosemui.h"
 
+#ifdef HAVE_XGIZ9_ROM
+#include "z9sl10810fw.h"
+#endif
 /* Length of the BIOS image */
 #define MAX_BIOSLEN         (64 * 1024L)
 
@@ -50,7 +53,7 @@ int vga_bios_init(void)
 			printf("skipping matrox cards\n");
 			return -1;
 		}
-
+#ifndef HAVE_XGIZ9_ROM
 		pci_read_config_dword(pdev,0x30,(int*)&romaddress);
 		romaddress &= (~1);
 		/* enable rom address decode */
@@ -63,8 +66,12 @@ int vga_bios_init(void)
 #ifdef BONITOEL
 		romaddress |= 0x10000000;
 #endif
+#endif
 		printf("Rom mapped to %lx\n",romaddress);
 
+#ifdef HAVE_XGIZ9_ROM
+		romaddress = z9sl10810_rom_data;
+#endif
 		magic[0] = readb(romaddress);
 		magic[1] = readb(romaddress + 1);
 
@@ -110,7 +117,11 @@ int vga_bios_init(void)
 			return -1;
 		}
 		VGAInfo[0].BIOSImageLen = romsize;
+#ifdef HAVE_XGIZ9_ROM
+		memcpy(VGAInfo[0].BIOSImage,(char*)romaddress,romsize);
+#else
 		memcpy(VGAInfo[0].BIOSImage,(char*)(0xa0000000|romaddress),romsize);
+#endif
 
     		BE_init(debugFlags,65536,&VGAInfo[0]);
 
@@ -131,10 +142,12 @@ BE_int86(0x10,&in,&out);
 }
 #endif
 
+#ifndef HAVE_XGIZ9_ROM
 		//BE_exit();
 		pci_read_config_dword(pdev,0x30,(int*)&romaddress);
 		/* disable rom address decode */
 		pci_write_config_dword(pdev,0x30,romaddress & ~1);
+#endif
 
 		printf("vgabios_init: Emulation done\n");
 		vga_available = 1;
