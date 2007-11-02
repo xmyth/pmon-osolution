@@ -167,3 +167,4 @@ option USE_ENVMAC
 select cmd_main
 select fatfs
 option FLOATINGPT
+select gzip
