@@ -104,6 +104,7 @@ int vga_bios_init(void)
 #ifdef HAVE_XGIZ9_ROM
 			romaddress = z9sl10810_rom_data;
 			XGIZ9_ROM = 1;
+			romsize = (readb(romaddress + 2)) * 512;
 #else 
 			printf("No valid bios found,magic=%x%x\n",magic[0],magic[1]);
 			return -1;
