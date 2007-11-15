@@ -30,12 +30,10 @@ typedef struct
 	int x,y16;
 }drop;
 drop drops[256];
-int rpro=-256;
-int tpro=0,wpro=0,newpage=0,oldpage=0,xo;
+int newpage=0,oldpage=0;
 int currentid=0,enterid=0,overid=1,overx1,overy1,overx2,overy2,nextab[4],nextco[4],nextid[4],winit=1;
-int theme=0;
-unsigned char bcolor=0xe0;
-unsigned char btncolortheme[2][3]={{0x00,0x30,0xe0},{0xe0,0xc0,0xf0}},btncolor[3];
+unsigned char bcolor=0x70;
+unsigned char btncolortheme[3]={0x00,0x10,0xf0},btncolor[3];
 extern void video_drawchars (int xx, int yy, unsigned char *s, int count);
 void w_setpage(int i)
 {
@@ -98,7 +96,7 @@ extern unsigned char* vgabh;
 
 static void w_cls()
 {
-	int i;
+	int i,j;
 	if(!vga_available)
 	{
 		printf("\e[2J");
@@ -111,7 +109,7 @@ static void w_cls()
 		memset(finalbuf,0x01,sizeof(foreground));
 		#else
 		for(i=0;i<80*25*2;i+=8)
-			*((long long *)(vgabh+i))=(long long)(0x0f000f000f000f00<<32)+0x0f000f000f000f00;
+			*(long long *)(vgabh+i)=(long long)(0x00000f0000000000<<32)+0x00000f0000000000;
 		#endif
 	}
 }
@@ -160,10 +158,10 @@ void w_init(void)
 		linux_outb(0x30,0x3c0);
 		linux_outb(j&0xf7,0x3c0);
 	
-		linux_outb(0,0x3c8);
+	/*	linux_outb(0,0x3c8);
 		for(j=0;j<16;j++)
 		{
-			for(i=0;i<8;i++)
+		/*	for(i=0;i<8;i++)
 			{
 				linux_outb(7,0x3c9);
 				linux_outb(0,0x3c9);
@@ -174,9 +172,9 @@ void w_init(void)
 			{
 				linux_outb(i<<3,0x3c9);
 				linux_outb(i<<3,0x3c9);
-				linux_outb(7<<3,0x3c9);
+				linux_outb(0<<3,0x3c9);
 			}
-		}
+		}*/
 #endif
 	}
 	w_initbackground();
@@ -192,70 +190,34 @@ static void w_copy(void *src,void *dest)//å¯¹é?ï¼?!!
 static void w_background(void)
 {
 	int i,j,y,y1;
-	if(theme&1)
-	{
-		for(i=0;i<256;i++)
-		{
-			y1=drops[i].y16>>16;
-			drops[i].y16+=drops[i].speed;
-			y=drops[i].y16>>16;
-			if(y!=y1 && drops[i].x<80)
-			{
-				for(y--,j=0;j<7;y--,j++)
-				if(inside(drops[i].x,y))
-					background[y][drops[i].x].color=((background[y][drops[i].x].color>1)?background[y][drops[i].x].color-1:1);
-			y+=7+drops[i].length;
-			if(inside(drops[i].x,y))
-			{
-				background[y][drops[i].x].text=rand()&127;
-				background[y][drops[i].x].color=15;
-			}
-			for(y--,j=0;j<7;y--,j++)
-				if(inside(drops[i].x,y))
-					background[y][drops[i].x].color=((background[y][drops[i].x].color>1)?background[y][drops[i].x].color-1:1);
-			}
-			
-			if(drops[i].y16>39*65536)
-				w_resetdrop(drops+i);
-		}
-		w_copy(background,foreground);
-	}
-	else
-	{
-		memset(foreground,0,sizeof(foreground));		
-
-		for(i=2;i<23;i++)
-			for(j=0;j<80;j++)
-				foreground[i][j].color=0xe0;
-		for(j=0;j<80;j++)
-			foreground[0][j].color=0xf0;
-		for(i=1;i<79;i++)
-			foreground[2][i].text=foreground[22][i].text=196;
-		for(i=3;i<22;i++)
-			foreground[i][0].text=foreground[i][79].text=foreground[i][48].text=179;
-		foreground[2][0].text=218;
-		foreground[2][79].text=191;
-		foreground[22][0].text=192;
-		foreground[22][79].text=217;
-		foreground[2][48].text=194;
-		foreground[22][48].text=193;
-		w_text(40,0,WA_CENTRE,"LOONGSON BIOS SETUP");
-		w_bigtext(0,23,80,2,"TAB:Change Color Schame(1-4)    Left Arrow & Right Arrow: Switch Page    Up Arrow & Down Arrow: Select Item    Enter: Confirm and Switch   ~:Run Command");
-	}
 	
+        memset(foreground,0,sizeof(foreground));		
+
+	for(i=2;i<23;i++)
+		for(j=0;j<80;j++)
+			foreground[i][j].color=0x70;
+	for(j=0;j<80;j++)
+		foreground[0][j].color=0xf0;
+	for(i=1;i<79;i++)
+		foreground[2][i].text=foreground[22][i].text=196;
+	for(i=3;i<22;i++)
+		foreground[i][0].text=foreground[i][79].text=foreground[i][48].text=179;
+	foreground[2][0].text=218;
+	foreground[2][79].text=191;
+	foreground[22][0].text=192;
+	foreground[22][79].text=217;
+	foreground[2][48].text=194;
+	foreground[22][48].text=193;
+	w_text(40,0,WA_CENTRE,"LOONGSON BIOS SETUP");
+	w_bigtext(0,23,80,2,"Left Arrow & Right Arrow: Select Page    Up Arrow & Down Arrow: Select Item    Enter: Confirm and Switch");
 }
 int charin=0,cn=0;
 char *chgconcolor[]={"\e[0;37;44m","\e[0;7m"};
 void w_present(void)
 {
 	char c,c0,c1;
-	//,d[20];
-	
 	int cnt;
 	int i,j,x,y;	
-	//struct termio tbuf;
-	if(theme&2)
-		rpro=1024;
 	if(vga_available)
 	{
 #if NMOD_FRAMEBUFFER
@@ -278,7 +240,6 @@ void w_present(void)
 	else		//COM output
 	{
 	
-		rpro=1024;
 		x=-2;y=-1;c0=-2;
 		for(j=1;j<25;j++)
 			for(i=0;i<80;i++)
@@ -306,42 +267,17 @@ void w_present(void)
 	//if(cn)printf("%x\n",cn);
 	winit=0;
 	w_background();
-	if(newpage!=oldpage)
-		if(rpro>0 && vga_available && (theme&2)==0)
-			rpro-=1;
-		else
-		{
-			//overx=overy=0;
-			overid=1;
-			if(vga_available && (theme&2)==0)
-				rpro=0;
-			oldpage=newpage;
-			winit=1;
-		}
-	else
-	 if(rpro<1024)
-		rpro+=1;
-	    else
-		rpro=1024;
-	if(rpro<=512)
-		wpro=rpro;
-	else wpro=512;
-	if(rpro>512)
-		tpro=rpro-512;
-	else
-		tpro=0;
-	xo=40*(512-wpro);
+	if(newpage!=oldpage){
+		overid=1;
+		oldpage=newpage;
+		winit=1;
+        }
 	charin=0;
 
 	enterid=-100;
 
 	switch(cn)
 	{
-		case '\t':
-			if(vga_available)
-				theme++;
-			w_defaultcolor();
-			break;
 		case '\n':
 			enterid=overid;
 			break;
@@ -379,13 +315,13 @@ static void w_text2(int x,int y,int xalign,char *ostr,int len)
 	int i,t;
 	if(y<0 || y> 24)
 		return;
-	t = len*tpro>>9;
+	t = len;
 	x -=  t >> xalign ;
 	for(i=0;i<t;i++)
 		if(ostr[i]!=' ' && ostr[i]!='\n' && inside(x+i,y))
 		{
 			foreground[y][x+i].text=ostr[i];
-			foreground[y][x+i].color&=0xf0;
+                	foreground[y][x+i].color&=0xf0;
 			foreground[y][x+i].color|=((~(foreground[y][x+i].color>>4))&0xf);
 		}
 }
@@ -398,10 +334,8 @@ void w_window(int x,int y,int w,int h,char *text)
 	int x1,y1,i,lpitch;
 	scr *tscr;	
 
-	x=( x * wpro + xo )>> 9;
-	y=( y * wpro ) >> 9;
-	x1=x+(w*wpro>>9);
-	y1=y+(h*wpro>>9);
+	x1=x+w;
+	y1=y+h;
 
 	if(x1<1 || x>79 || y1<1 || y>24)
 		return;
@@ -416,7 +350,7 @@ void w_window(int x,int y,int w,int h,char *text)
 		y1=25;
 	
 	tscr=&(foreground[y][x]);
-	lpitch=80-(x1-x);
+	lpitch=80-w;
 	for(i=x;i<x1;i++,tscr++)
 	{
 		tscr->text=' ';
@@ -427,7 +361,7 @@ void w_window(int x,int y,int w,int h,char *text)
 	{
 		tscr+=lpitch;
 		for(i=x;i<x1;i++,tscr++)
-			tscr->color=(tscr->color>>2&0xf3);
+			tscr->color=0x1c;//(tscr->color>>2&0xf3);
 	}
 }
 
@@ -560,7 +494,7 @@ void w_setcolor(char windowcolor,char buttonunused,char buttonused)
 }
 void w_defaultcolor()
 {
-	memcpy(btncolor,btncolortheme[theme&1],3);
+	memcpy(btncolor,btncolortheme,3);
 	bcolor=btncolor[0];
 }
 int w_keydown(int kin)

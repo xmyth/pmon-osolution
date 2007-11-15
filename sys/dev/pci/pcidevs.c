@@ -4,8 +4,16 @@
 #include "pcivar.h"
 #include "pcireg.h"
 #include "pcidevs.h"
+#include "sys/device.h"
+#include "sys/queue.h"
 
 extern int _pciverbose;
+
+int PciList_num;
+char PciList[25][256];
+
+int DevList_num;
+char DevList[5][256];
 
 /*
  * Descriptions of known PCI classes and subclasses.
@@ -265,3 +273,157 @@ _pci_devinfo(pcireg_t id_reg, pcireg_t class_reg, int *supp, char *cp)
 	cp+=sprintf(cp,")");
 /*	strcpy (cp, ")");*/
 }
+
+
+void
+_pci_devinfo_forwindow(pcireg_t id_reg, pcireg_t class_reg, int *supp, char *cp)
+{
+	pci_vendor_id_t vendor;
+	pci_product_id_t product;
+	pci_class_t class;
+	pci_subclass_t subclass;
+	pci_interface_t interface;
+	pci_revision_t revision;
+	char *vendor_namep, *product_namep;
+	const struct pci_class *classp;
+	const struct pci_class *subclassp;
+	const struct pci_knowndev *kdp;
+
+	vendor = PCI_VENDOR(id_reg);
+	product = PCI_PRODUCT(id_reg);
+
+	class = PCI_CLASS(class_reg);
+	subclass = PCI_SUBCLASS(class_reg);
+	interface = PCI_INTERFACE(class_reg);
+	revision = PCI_REVISION(class_reg);
+
+	kdp = pci_knowndevs;
+        while (kdp->vendorname != NULL) {	/* all have vendor name */
+                if (kdp->vendor == vendor && (kdp->product == product ||
+		    (kdp->flags & PCI_KNOWNDEV_NOPROD) != 0))
+                        break;
+		kdp++;
+	}
+        if (kdp->vendorname == NULL) {
+		vendor_namep = product_namep = NULL;
+		if (supp != NULL)
+			*supp = 0;
+        } else {
+		vendor_namep = kdp->vendorname;
+		product_namep = (kdp->flags & PCI_KNOWNDEV_NOPROD) == 0 ?
+		    kdp->productname : NULL;
+		if (supp != NULL)
+			*supp = (kdp->flags & PCI_KNOWNDEV_UNSUPP) == 0;
+        }
+
+	classp = pci_class;
+	while (classp->name != NULL) {
+		if (class == classp->val)
+			break;
+		classp++;
+	}
+
+	subclassp = (classp->name != NULL) ? classp->subclasses : NULL;
+	while (subclassp && subclassp->name != NULL) {
+		if (subclass == subclassp->val)
+			break;
+		subclassp++;
+	}
+
+	if(classp->name && subclassp->name)
+		{
+		sprintf(PciList[PciList_num++], "%s %s", classp->name, subclassp->name);
+		}
+	
+	
+}
+
+
+static int
+pci_query_dev_forwindow(pcireg_t tag)
+{
+        pcireg_t class, id;
+        int dev, func, i;
+        char devinfo[256];
+
+        class = _pci_conf_read(tag, PCI_CLASS_REG);
+        id = _pci_conf_read(tag, PCI_ID_REG);
+        if(class < 0) {
+                return(-1);
+        }
+        _pci_break_tag (tag, NULL, &dev, &func);
+        _pci_devinfo_forwindow(id, class, NULL, devinfo);
+
+        return(0);
+} 
+
+
+
+int
+_pciscan_forwindow()
+{
+        int c, bus, dev, func;
+        pcireg_t tag, bhlc;
+        int ndevs, maxbus, maxdev, firstdev;
+	PciList_num= 0;
+	DevList_num = 0;
+	bus = 0;
+	maxbus = 255;
+	firstdev = 0;
+	maxdev = 31;
+        for (; bus <= maxbus; bus++) {
+                ndevs = 0;
+                for(dev = firstdev; dev <= maxdev; dev++) {
+                        tag = _pci_make_tag(bus, dev, 0);
+                        bhlc = _pci_conf_read(tag, PCI_ID_REG);
+                        if(bhlc == 0 || bhlc == 0xffffffff) {
+                                continue;
+                        }
+                        bhlc = _pci_conf_read(tag, PCI_BHLC_REG);
+                        if (PCI_HDRTYPE_MULTIFN(bhlc)) {
+                                for(func = 0; func < 8; func++) {
+                                        tag = _pci_make_tag(bus, dev, func);
+                                        bhlc = _pci_conf_read(tag, PCI_ID_REG);
+                                        if(bhlc == 0 || bhlc == 0xffffffff) {
+                                                continue;
+                                        }
+                                        if(pci_query_dev_forwindow(tag) < 0) {
+                                                break;
+                                        }
+                                        ndevs++;
+                                }
+                        }
+                        else {
+                                if(pci_query_dev_forwindow(tag) >= 0) {
+                                        ndevs++;
+                                }
+                        }
+                }
+        }
+        return(0);
+}
+
+
+int
+_devls_forwindow()
+{
+	struct device *dev, *next_dev;
+	
+	char *devclass[] = {
+		"DULL", "CPU", "DISK", "IFNET", "TAPE", "TTY"
+	};
+
+
+	DevList_num= 0;
+	
+	for (dev  = TAILQ_FIRST(&alldevs); dev != NULL; dev = next_dev) {
+		next_dev = TAILQ_NEXT(dev, dv_list);
+		if( dev->dv_class < DV_DISK) {
+			continue;
+		}
+		sprintf(DevList[DevList_num++], "%-12s %s\n", &dev->dv_xname, devclass[dev->dv_class]);
+	}
+
+	return(1);
+}
+
