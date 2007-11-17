@@ -111,7 +111,7 @@
 		w_setpage(Page_MAIN);
 
 		strcpy(tinput,"");
-		strcpy(w1[0],"vmlinux");
+		strcpy(w1[0],"boot/vmlinux");
 		strcpy(w1[1],"/dev/hda1");
 		strcpy(w1[2],"192.168.110.100");
 		strcpy(w2[0],"192.168.110.176");	
