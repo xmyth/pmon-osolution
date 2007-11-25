@@ -109,7 +109,7 @@ static void w_cls()
 		memset(finalbuf,0x01,sizeof(foreground));
 		#else
 		for(i=0;i<80*25*2;i+=8)
-			*(long long *)(vgabh+i)=(long long)(0x00000f0000000000<<32)+0x00000f0000000000;
+			*(long long *)(vgabh+i)=(long long)(0x0000000000000000<<32)+0x0700070007000700;
 		#endif
 	}
 }

@@ -222,11 +222,11 @@
                                 for(i=0;i<PciList_num;i++)
                                         w_text(8,(5+i+1),WA_LEFT,PciList[i]);
 
-                                w_text(2,16,WA_LEFT,"Drive Information");
+                                w_text(2,18,WA_LEFT,"Drive Information");
                                 if(w_focused())
                                         hint = "Display Drive Device";
                                 for(i=0;i<DevList_num;i++)
-                                        w_text(8,(16+i+1),WA_LEFT,DevList[i]);
+                                        w_text(8,(18+i+1),WA_LEFT,DevList[i]);
 
                                 break;
                         case Page_Boot://select boot device
