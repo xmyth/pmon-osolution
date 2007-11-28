@@ -703,7 +703,8 @@ reginit:			/* local name */
 	 * reading the I2C EEROM on the DIMMS
 	 */
 
-#if 0
+	PRINTSTR("[Test i2c.S start]\r\n")
+//#if 0
 #include "i2c.S"
 	beqz msize,.nodimm
 	nop
@@ -712,30 +713,8 @@ reginit:			/* local name */
 .nodimm:
 	move	dbg,a0
 	PRINTSTR ("\r\nNo DIMM in all slots,use default configure\r\n")
-	li  msize,0x10000000
- 	//li	sdCfg,0x055043df         /* zgj-8-7-14-13 */
-2:
-	PRINTSTR("DIMM SIZE=")
-	move	a0,msize
-	bal	hexserial
-	nop
-	PRINTSTR("\r\n")
 
-	li	t0, 0xbff00008
-	sd	sdCfg, 0(t0)
-/*
-	#### gx 2006-03-17: mode ####
-	#li	t1,0x20
-	li	t1,0x28
-	li	t0, 0xbff00000
-	sw	t1,0(t0)
-	nop
-	li	t1,0x0
-	li	t0, 0xbff00000
-	sw	t1,0x30(t0)
-	nop
-
-	PRINTSTR("sdcfg=");
+2:	PRINTSTR("sdcfg=");
 	move	a0,sdCfg
 	bal	hexserial
 	nop
@@ -745,9 +724,8 @@ reginit:			/* local name */
 	bal	hexserial
 	nop
 	PRINTSTR("\r\n")
-*/
 ##############################################
-#endif
+//#endif
 gs_2f_v3_ddr2_cfg:
 
     ###enable the reg space###
@@ -759,7 +737,7 @@ gs_2f_v3_ddr2_cfg:
         #or  a1,a1,0x100
         sd  a1,0x0(t2)
 #endif    
-	li	msize,0x0f000000
+	//li	msize,0x0f000000
 	PRINTSTR("DDR2 config begin_whd\r\n")
 	bal	ddr2_config
 	nop
@@ -1103,7 +1081,7 @@ zhb:
         or     a0,a0,0x3
         mtc0   a0,COP_0_CONFIG
 #endif
-	li	msize,(512<<20)
+//	li	msize,(512<<20)
 
 	move	a0,msize
 	srl	a0,20
@@ -1699,6 +1677,24 @@ reg_write:
     ############start##########
 	//PRINTSTR("start\n\r");
     li      t2, CONFIG_BASE
+    la 		t0, DDR2_CTL_07_DATA_LO
+    addu    	t0, t0, s0
+    ld		a1, 0x0(t0)
+    beq	    	sdCfg,0x1,1f
+    nop
+    and		a1, 0xfff3ffff
+    b		2f
+    nop
+1:  and		a1, 0xfff1ffff
+2:  
+    sd	    a1, 0x70(t2)
+    move 	a0, a1
+    move	t7, ra
+    bal		hexserial
+    nop
+    move	ra, t7
+
+    li      t2, CONFIG_BASE
     la		t0,DDR2_CTL_start_DATA_LO
     #la		t0,ddr2_start_reg
     addu    	t0, t0, s0
@@ -1755,7 +1751,7 @@ DDR2_CTL_06_DATA_HI:	.word 0x0a030203 #250M CL=4
 //DDR2_CTL_06_DATA_HI:	.word 0x0a020203 #CL=3
 //DDR2_CTL_06_DATA_HI:	.word 0x0a040306 #800
 //0000_0000 ecc_c_id 0000_1111 cs_map 0000_0111 caslat_lin_gate 0000_1010 caslat_lin
-DDR2_CTL_07_DATA_LO:	.word 0x000f0808 #CL=4//cs_map to cs0-cs3
+DDR2_CTL_07_DATA_LO:	.word 0x00030808 #CL=4//cs_map to cs0-cs3
 //DDR2_CTL_07_DATA_LO:	.word 0x000f0606 #CL=3///cs_map to cs0-cs3
 //DDR2_CTL_07_DATA_LO:	.word 0x000f0a0b #CL=5//cs_map to cs0-cs3
 //DDR2_CTL_07_DATA_LO:	.word 0x000c0708 #CL=4//cs_map to cs2-cs3

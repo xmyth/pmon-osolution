@@ -189,7 +189,7 @@ void
 initmips(unsigned int memsz)
 {
 /*enable float*/
-memsz=512;
+//memsz=512;
 
 tgt_fpuenable();
 	/*
