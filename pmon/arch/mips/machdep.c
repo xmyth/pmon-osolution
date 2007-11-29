@@ -56,7 +56,7 @@
 
 #include <pmon.h>
 
-extern int memorysize;
+extern unsigned int memorysize;
 extern u_int8_t end[];
 #ifdef GODSONEV1
 extern int global_div_num;

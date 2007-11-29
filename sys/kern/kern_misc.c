@@ -313,7 +313,7 @@ void vminit __P((void));
 void
 vminit ()
 {
-extern int memorysize;
+extern unsigned int memorysize;
 
 	if (!kmem) {
 		/* grab a chunk at the top of memory */

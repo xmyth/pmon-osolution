@@ -70,8 +70,8 @@ char            line[LINESZ + 1];	/* input line */
 struct termio	clntterm;	/* client terminal mode */
 struct termio	consterm;	/* console terminal mode */
 register_t	initial_sr;
-int             memorysize;
-int             memorysize_high;
+unsigned int    memorysize;
+unsigned int    memorysize_high;
 char            prnbuf[LINESZ + 8];	/* commonly used print buffer */
 
 int             repeating_cmd;
