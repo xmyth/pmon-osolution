@@ -776,14 +776,19 @@ not_locked:
 	
 skipdimm:
 
+	PRINTSTR("Init SDRAM Done!1\r\n");
 	li	t1,0		# accumulate pcimembasecfg settings
 		
 	/* set bar0 mask and translation to point to SDRAM */
-	sub	t0,msize,1
+	//sub	t0,msize,1
+	//sub	t0,0x0f000000,1
+	li	t0,0x0effffff
+	PRINTSTR("Init SDRAM Done!2\r\n");
 	not	t0
 	srl	t0,BONITO_PCIMEMBASECFG_ASHIFT-BONITO_PCIMEMBASECFG_MEMBASE0_MASK_SHIFT
 	and	t0,BONITO_PCIMEMBASECFG_MEMBASE0_MASK
 	or	t1,t0
+	PRINTSTR("Init SDRAM Done!3\r\n");
 	
 	li	t0,0x00000000
 	srl	t0,BONITO_PCIMEMBASECFG_ASHIFT-BONITO_PCIMEMBASECFG_MEMBASE0_TRANS_SHIFT
@@ -1682,11 +1687,26 @@ reg_write:
     ld		a1, 0x0(t0)
     beq	    	sdCfg,0x1,1f
     nop
-    and		a1, 0xfff3ffff
-    b		2f
+    beq		sdCfg,0x2,2f
+    nop
+    beq		sdCfg,0x3,3f
+    nop
+    b		5f
     nop
 1:  and		a1, 0xfff1ffff
-2:  
+    b		5f
+    nop
+2:  and		a1, 0xfff3ffff
+    b		5f
+    nop
+3:  and		a1, 0xfff7ffff
+    b		5f
+    nop
+5:  
+
+
+
+
     sd	    a1, 0x70(t2)
     move 	a0, a1
     move	t7, ra
@@ -1751,7 +1771,7 @@ DDR2_CTL_06_DATA_HI:	.word 0x0a030203 #250M CL=4
 //DDR2_CTL_06_DATA_HI:	.word 0x0a020203 #CL=3
 //DDR2_CTL_06_DATA_HI:	.word 0x0a040306 #800
 //0000_0000 ecc_c_id 0000_1111 cs_map 0000_0111 caslat_lin_gate 0000_1010 caslat_lin
-DDR2_CTL_07_DATA_LO:	.word 0x00030808 #CL=4//cs_map to cs0-cs3
+DDR2_CTL_07_DATA_LO:	.word 0x000f0808 #CL=4//cs_map to cs0-cs3
 //DDR2_CTL_07_DATA_LO:	.word 0x000f0606 #CL=3///cs_map to cs0-cs3
 //DDR2_CTL_07_DATA_LO:	.word 0x000f0a0b #CL=5//cs_map to cs0-cs3
 //DDR2_CTL_07_DATA_LO:	.word 0x000c0708 #CL=4//cs_map to cs2-cs3

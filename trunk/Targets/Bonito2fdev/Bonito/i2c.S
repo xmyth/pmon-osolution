@@ -78,54 +78,96 @@ LEAF(ii2c_cfg)
 	nop
 #endif
        
-	/* read DIMM number of rows */
+	/* read Module Rank Density */
+	PRINTSTR("Read Module Rank Density at 0x1f\r\n")
 	move	a0,t5	/* #zgj-11-17 */
-	li	a1,3
+	li	a1,0x1f
 	bal	i2cread
 	nop
-	li	a0,1
-	sll 	tmpsize,a0,v0
-	PRINTSTR("read number of rows\r\n")
-
-	/* read DIMM number of cols */
-    	move    a0,t5   /* #zgj-11-17 */
-	li	a1,4
-	bal	i2cread
+	move 	v1, v0
+	andi	v1, 0x1
+	beqz	v1, 1f
 	nop
-   	sll	tmpsize,tmpsize,v0
-	PRINTSTR("read number of cols\r\n")
+	li 	msize, 0x40000000 
+	//1G
+	b	9f
+	nop
+1:	move 	v1, v0
+	andi	v1, 0x2 
+	beqz	v1, 2f
+	nop
+	li 	msize, 0x80000000 
+	//2G
+	b	9f
+	nop
+2:	move 	v1, v0
+	andi	v1, 0x4 
+	beqz	v1, 3f
+	nop
+	li 	msize, 0x100000000 
+	//4G
+	b	9f
+	nop
+3:	move 	v1, v0
+	andi	v1, 0x8 
+	beqz	v1, 4f
+	nop
+	li 	msize, 0x400000000 
+	//8G
+	b	9f
+	nop
+4:	move 	v1, v0
+	andi	v1, 0x10 
+	beqz	v1, 5f
+	nop
+	li 	msize, 0x800000000 
+	//16G
+	b	9f
+	nop
+5:	move 	v1, v0
+	andi	v1, 0x20 
+	beqz	v1, 6f
+	nop
+	li 	msize, 0x8000000 
+	//128M
+	b	9f
+	nop
+6:	move 	v1, v0
+	andi	v1, 0x40 
+	beqz	v1, 7f
+	nop
+	li 	msize, 0x10000000 
+	//256M
+	b	9f
+	nop
+7:	move 	v1, v0
+	andi	v1, 0x80 
+	beqz	v1, 9f
+	nop
+	li 	msize, 0x20000000 
+	//512M
+	b	9f
+	nop
+	
+9:
 
-	/* read DIMM number of cols */
-    	move    a0,t5   /* #zgj-11-17 */
+
+	/* read Number of DIMM Ranks*/
+	PRINTSTR("Read Number of DIMM Ranks at 0x5\r\n")
+    	move    a0,t5  
 	li	a1,5
 	bal	i2cread
 	nop
-	andi	v0, 1
-	li 	sdCfg, 1
-	beq	v0,0x1,1f
+	andi	v0, 0xf
+	move 	sdCfg, v0
+	addi	sdCfg, 1
+	mul	msize, sdCfg
 	nop
-	b 	2f
-	nop
-1:	li	sdCfg, 3	
-2:   	sll	tmpsize,tmpsize,v0
-	PRINTSTR("read number of banks\r\n")
 
-	/* read DIMM number of cols */
-    	move    a0,t5   /* #zgj-11-17 */
-	li	a1,6
-	bal	i2cread
-	nop
-	srl	v0, v0, 1
-   	//sll     tmpsize,tmpsize,v0 # multiply by 4M
-	mul	tmpsize,v0
 #####################################################
-	addu	msize,tmpsize
 	move	a0, msize
 	bal 	hexserial
 	nop
-	b 1f
-	nop
-1:
 	jr t6
 	nop
 END(ii2c_cfg)

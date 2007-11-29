@@ -34,8 +34,8 @@
 	#define TM_YEAR_BASE 1900
 	#include "cmd_hist.h"
 	#include "cmd_more.h"
-	extern int             memorysize;
-	extern int             memorysize_high;
+	extern unsigned int             memorysize;
+	extern unsigned int             memorysize_high;
         
         extern char PciList[32][256];
         extern int PciList_num;
