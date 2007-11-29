@@ -776,19 +776,16 @@ not_locked:
 	
 skipdimm:
 
-	PRINTSTR("Init SDRAM Done!1\r\n");
 	li	t1,0		# accumulate pcimembasecfg settings
 		
 	/* set bar0 mask and translation to point to SDRAM */
 	//sub	t0,msize,1
 	//sub	t0,0x0f000000,1
 	li	t0,0x0effffff
-	PRINTSTR("Init SDRAM Done!2\r\n");
 	not	t0
 	srl	t0,BONITO_PCIMEMBASECFG_ASHIFT-BONITO_PCIMEMBASECFG_MEMBASE0_MASK_SHIFT
 	and	t0,BONITO_PCIMEMBASECFG_MEMBASE0_MASK
 	or	t1,t0
-	PRINTSTR("Init SDRAM Done!3\r\n");
 	
 	li	t0,0x00000000
 	srl	t0,BONITO_PCIMEMBASECFG_ASHIFT-BONITO_PCIMEMBASECFG_MEMBASE0_TRANS_SHIFT
