@@ -17,6 +17,9 @@
  */
 
 /*** CONFIG REGISTERS AND VALUES */
+#define HWMON_IO_BASE_ADDR  0x70  
+#define HWMON_IO_BASE_VALUE	0xee01
+
 #define SMBUS_IO_BASE_ADDR  0x90  
 #define SMBUS_IO_BASE_VALUE	0xeee1
 

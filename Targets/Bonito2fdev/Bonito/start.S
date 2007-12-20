@@ -445,7 +445,8 @@ locate:
 	BONITO_BIS(BONITO_BONGENCFG, BONITO_BONGENCFG_DEBUGMODE)
 
     /******** added to init southbridge*/
-	
+	/* Set HwMon base address */
+	ISABWWR_INIT(4, HWMON_IO_BASE_ADDR, HWMON_IO_BASE_VALUE | 0x1)	
 	/* Set the SMB base address */
 	ISABWWR_INIT(4, SMBUS_IO_BASE_ADDR, SMBUS_IO_BASE_VALUE | 0x1)
 	/* enable the host controller */
