@@ -154,7 +154,7 @@ LEAF(ii2c_cfg)
 
 	/* read Number of DIMM Ranks*/
 	PRINTSTR("Read Number of DIMM Ranks at 0x5\r\n")
-    	move    a0,t5  
+    move    a0,t5  
 	li	a1,5
 	bal	i2cread
 	nop
@@ -164,10 +164,40 @@ LEAF(ii2c_cfg)
 	mul	msize, sdCfg
 	nop
 
+	/* read Row Number of DIMM Ranks*/
+	PRINTSTR("Read Row Number of DIMM Ranks at 0x3\r\n")
+   	move    a0,t5  
+	li	a1,3
+	bal	i2cread
+	nop
+	andi	v0, 0xf
+	sll		v0, v0,12
+	or		sdCfg, v0
+	nop
+	
+	/* read Col Number of DIMM Ranks*/
+	PRINTSTR("Read Col Number of DIMM Ranks at 0x4\r\n")
+    move    a0,t5  
+	li	a1,4
+	bal	i2cread
+	nop
+	andi	v0, 0xf
+	sll		v0, v0, 8
+	or		sdCfg, v0
+	nop
+
+	PRINTSTR("DDR Cfg = ")
+	move	a0, sdCfg
+	bal 	hexserial
+	nop
+	PRINTSTR("\r\n")
+
 #####################################################
+	PRINTSTR("Memory Size = ")
 	move	a0, msize
 	bal 	hexserial
 	nop
+	PRINTSTR("\r\n")
 	jr t6
 	nop
 END(ii2c_cfg)
