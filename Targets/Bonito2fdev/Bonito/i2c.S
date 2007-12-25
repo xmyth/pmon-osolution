@@ -151,6 +151,7 @@ LEAF(ii2c_cfg)
 	
 9:
 
+	//sdCfg Format:   4Bit(Row)|4Bit(Col)|3Bit(unused)|1Bit(number of bank)|4Bit(CS)
 
 	/* read Number of DIMM Ranks*/
 	PRINTSTR("Read Number of DIMM Ranks at 0x5\r\n")
@@ -186,7 +187,26 @@ LEAF(ii2c_cfg)
 	or		sdCfg, v0
 	nop
 
-	PRINTSTR("DDR Cfg = ")
+	/* read Number of Banks*/
+	PRINTSTR("Read Number of Banks at 17\r\n")
+    move    a0,t5  
+	li	a1, 0x11
+	bal	i2cread
+	nop
+	andi	v0, 0xf
+	srl		v0, v0, 3
+	sll		v0, v0, 4
+	or		sdCfg, v0
+	nop
+
+	andi	v0, 0x8
+	beqz	v0, 1f
+	nop
+	li		v0, 0x10
+	or		sdCfg, v0
+1:	
+
+	PRINTSTR("\r\nDDR Cfg = ")
 	move	a0, sdCfg
 	bal 	hexserial
 	nop
