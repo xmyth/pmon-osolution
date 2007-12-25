@@ -1737,6 +1737,29 @@ reg_write:
     nop
     move	ra, t7
 
+
+	//Modify the Number of Bank
+    li      t2, CONFIG_BASE
+    la 		t0, DDR2_CTL_01_DATA_LO
+    addu    t0, t0, s0
+    ld		a1, 0x0(t0)
+	li 		a1, 0
+    move	a0, sdCfg
+    andi	a0, 0x10
+    dsll	a0, a0, 28
+    or		a1, a0
+
+    sd		a1, 0x10(t2)
+    
+
+	dsrl		a1, 32
+    move 	a0, a1
+    move	t7, ra
+    bal		hexserial
+    nop
+    move	ra, t7
+
+
 	//Initialize
     li      t2, CONFIG_BASE
     la		t0,DDR2_CTL_start_DATA_LO
