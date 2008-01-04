@@ -447,7 +447,7 @@ int usb_get_configuration_no(struct usb_device *dev,unsigned char *buffer,int cf
 		if (result < 0)
 			printf("unable to get descriptor, error %lX\n",dev->status);
 		else
-			printf("config descriptor too short (expected %i, got %i)\n",8,result);
+			printf("config descriptor too short (expected %d, got %d)\n",8,result);
 		return -1;
 	}
 	tmp=swap_16(config->wTotalLength);
@@ -839,7 +839,7 @@ int usb_new_device(struct usb_device *dev)
 		/* reset the port for the second time */
 		err = hub_port_reset(dev->parent, port, &portstatus);
 		if (err < 0) {
-			printf("\n     Couldn't reset port %i\n", port);
+			printf("\n     Couldn't reset port %d\n", port);
 			return 1;
 		}
 	}
@@ -887,7 +887,7 @@ int usb_new_device(struct usb_device *dev)
 		if (err < 0)
 			printf("unable to get device descriptor (error=%d)\n",err);
 		else
-			printf("USB device descriptor short read (expected %i, got %i)\n",tmp,err);
+			printf("USB device descriptor short read (expected %d, got %d)\n",tmp,err);
 		return 1;
 	}
 #ifdef USB_DEBUG
@@ -1123,7 +1123,7 @@ static int hub_port_reset(struct usb_device *dev, int port,
 	}
 
 	if (tries==MAX_TRIES) {
-		USB_HUB_PRINTF("Cannot enable port %i after %i retries, disabling port.\n", port+1, MAX_TRIES);
+		USB_HUB_PRINTF("Cannot enable port %d after %d retries, disabling port.\n", port+1, MAX_TRIES);
 		USB_HUB_PRINTF("Maybe the USB cable is bad?\n");
 		return -1;
 	}
@@ -1168,7 +1168,7 @@ void usb_hub_port_connect_change(struct usb_device *dev, int port)
 
 	/* Reset the port */
 	if (hub_port_reset(dev, port, &portstatus) < 0) {
-		printf("cannot reset port %i!?\n", port + 1);
+		printf("cannot reset port %d!?\n", port + 1);
 		return;
 	}
 
@@ -1317,7 +1317,7 @@ int usb_hub_configure(struct usb_device *dev)
 			 * Works at least with mouse driver */
 			if (!(portstatus & USB_PORT_STAT_ENABLE) &&
 				(portstatus & USB_PORT_STAT_CONNECTION) && (dev->children[i])) {
-				USB_HUB_PRINTF("already running port %i disabled by hub (EMI?), re-enabling...\n",
+				USB_HUB_PRINTF("already running port %d disabled by hub (EMI?), re-enabling...\n",
 					i + 1);
 					usb_hub_port_connect_change(dev, i);
 			}
