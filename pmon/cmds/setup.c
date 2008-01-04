@@ -512,8 +512,8 @@ struct setupMenu netcardmenu={
 (struct setupMenuitem[])
 {
 {POP_Y,POP_X,1,1,TYPE_CMD,"    NIC Setup"},
-{POP_Y+1,POP_X,2,2,TYPE_EDITMENU,"(1)set ip=ic=[em0||em1||fxp0] ip=172.16.21.66;;set ip=ifaddr $ic $ip"},
-{POP_Y+2,POP_X,3,3,TYPE_EDITMENU,"(2)ifconfig=ic=[em0||em1||fxp0] ip=172.16.21.66;;set ifconfig=set ifconfig $ic:$ip"},
+{POP_Y+1,POP_X,2,2,TYPE_EDITMENU,"(1)set ip=ic=[em0||em1||fxp0] ip=192.168.0.14;;set ip=ifaddr $ic $ip"},
+{POP_Y+2,POP_X,3,3,TYPE_EDITMENU,"(2)ifconfig=ic=[em0||em1||fxp0] ip=192.168.0.14;;set ifconfig=set ifconfig $ic:$ip"},
 {POP_Y+3,POP_X,4,4,TYPE_EDITMENU,"(3)serverip for test=ip=${#serverip};;set serverip=set serverip $ip"},
 {POP_Y+4,POP_X,5,5,TYPE_EDITMENU,"(4)clientip for test=ip=${#clientip};;set clientip=set clientip $ip"},
 {POP_Y+5,POP_X,1,1,TYPE_NONE,"(5)quit",setup_quit},
@@ -606,7 +606,7 @@ struct setupMenu othersmenu={
 {POP_Y,POP_X,1,1,TYPE_NONE,"    others setup"},
 {POP_Y+1,POP_X,2,2,TYPE_EDITMENU,"(1)reload pmon form tftp=ip=172.16.21.66 file=gzram;;reload pmon=load tftp://$ip/$file;g"},
 {POP_Y+2,POP_X,3,3,TYPE_EDITMENU,"(2)update pmon from disk=disk=[wd0||wd1||fd0] file=gzrom.bin;;update pmon form hd/fd=load -f 0xbfc00000 -r /dev/fs/ext2@$disk/$file;;update pmon from cd=load -f 0xbfc00000 -r /dev/fs/ext2@cd0/$file"},
-{POP_Y+3,POP_X,4,4,TYPE_EDITMENU,"(3)update pmon from tftp=ip=172.16.21.66 file=gzrom.bin;;update pmon=load -f 0xbfc00000 -r tftp://$ip/$file"},
+{POP_Y+3,POP_X,4,4,TYPE_EDITMENU,"(3)update pmon from tftp=ip=192.168.0.14 file=gzrom.mem;;update pmon=load -f 0xbfc00000 -r tftp://$ip/$file"},
 {POP_Y+4,POP_X,5,5,TYPE_EDITMENU,"(4)heaptop=heaptop=[80100000||80300000];;set heaptop=set heaptop $heaptop"},
 {POP_Y+5,POP_X,6,6,TYPE_MSG,"(5)other info",0,helpmsg},
 {POP_Y+6,POP_X,7,7,TYPE_EDITMENU,"(6)${!tm}=zone=${#TZ} year=${!tm_year} month=${!tm_mon} day=${!tm_mday} hour=${!tm_hour} min=${!tm_min} sec=${!tm_sec};;set date=date ${year}${month}${day}${hour}${min}.${sec};;set zone=set TZ ${zone}"},

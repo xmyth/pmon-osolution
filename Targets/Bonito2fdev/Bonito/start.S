@@ -1779,7 +1779,7 @@ reg_write:
 	.align 5
 ddr2_reg_data:
 //0000000_0 arefresh 0000000_0 ap 0000000_1 addr_cmp_en 0000000_1 active_aging
-DDR2_CTL_00_DATA_LO:    .word 0x00000101
+DDR2_CTL_00_DATA_LO:    .word 0x01010101
 // 0000000_1 ddrii_sdram_mode 0000000_0 concurrentap 0000000_1 bank_split_en 0000000_0 auto_refresh_mode 
 DDR2_CTL_00_DATA_HI:    .word 0x01000100 #no_concurrentap
 //0000000_0 ecc_disable_w_uc_err 0000000_1 dqs_n_en 0000000_0 dll_bypass_mode 0000000_0 dlllockreg
@@ -1799,7 +1799,7 @@ DDR2_CTL_04_DATA_LO:    .word 0x01010101
 //000000_01 rtt_0 000000_00 ctrl_raw 000000_10 axi0_w_priority 000000_10 axi0_r_priority 
 DDR2_CTL_04_DATA_HI:    .word 0x01000202
 //00000_100 column_size 00000_101 caslat 00000_010 addr_pins 000000_10 rtt_pad_termination 
-DDR2_CTL_05_DATA_LO:    .word 0x00050002 #CL =5 64Mx8bit
+DDR2_CTL_05_DATA_LO:    .word 0x00050002 #CL =5 Auto detect Row and Col
 //DDR2_CTL_05_DATA_LO:    .word 0x04050202 #CL =5 32Mx16bit
 //00000_000 q_fullness 00000_000 port_data_error_type 00000_000 out_of_range_type 00000_000 max_cs_reg 
 DDR2_CTL_05_DATA_HI:    .word 0x00000000
@@ -1822,29 +1822,32 @@ DDR2_CTL_09_DATA_HI:    .word 0x0000060c
 //00_111111 age_count 000_11010 trc 000_00010 tmrd 000_00000 tfaw
 DDR2_CTL_10_DATA_LO:    .word 0x3f1a0200
 //0_0010010 dll_dqs_delay_2 0_0010010 dll_dqs_delay_1 0_0010010 dll_dqs_delay_0 00_111111 command_age_count 
-DDR2_CTL_10_DATA_HI:    .word 0x1313133f
+DDR2_CTL_10_DATA_HI:    .word 0x1111113f
 //0_0010010 dll_dqs_delay_6 0_0010010 dll_dqs_delay_5 0_0010010 dll_dqs_delay_4 0_0010010 dll_dqs_delay_3
-DDR2_CTL_11_DATA_LO:    .word 0x13131313
-//0_1011111 wr_dqs_shift 0_1111111 dqs_out_shift 0_0010010 dll_dqs_delay_8 0_0010010 dll_dqs_delay_7 
-DDR2_CTL_11_DATA_HI:    .word 0x5f7f1313
+DDR2_CTL_11_DATA_LO:    .word 0x11111111
+//0_1011011 wr_dqs_shift 0_1111110 dqs_out_shift 0_0010010 dll_dqs_delay_8 0_0010010 dll_dqs_delay_7 
+DDR2_CTL_11_DATA_HI:    .word 0x5f7f1111
 //00010011 tras_min 00000000 out_of_range_length 00000000 ecc_u_synd 00000000 ecc_c_synd
 DDR2_CTL_12_DATA_LO:    .word 0x13000000
 //0000000_000101010 dll_dqs_delay_bypass_0 00111100 trfc 00000110 trcd_int 
 DDR2_CTL_12_DATA_HI:    .word 0x002a3c06
+//DDR2_CTL_12_DATA_HI:    .word 0x000a3c06
 //0000000_000101010 dll_dqs_delay_bypass_2 0000000_000101010 dll_dqs_delay_bypass_1
-DDR2_CTL_13_DATA_LO:    .word 0x002a002a 
+DDR2_CTL_13_DATA_LO:    .word 0x002a002a
 //0000000_000101010 dll_dqs_delay_bypass_4 0000000_000101010 dll_dqs_delay_bypass_3 
 DDR2_CTL_13_DATA_HI:    .word 0x002a002a
 //0000000_000101010 dll_dqs_delay_bypass_6 0000000_000101010 dll_dqs_delay_bypass_5
 DDR2_CTL_14_DATA_LO:    .word 0x002a002a
 //0000000_000101010 dll_dqs_delay_bypass_8 0000000_000101010 dll_dqs_delay_bypass_7 
-DDR2_CTL_14_DATA_HI:    .word 0x002a002a 
+DDR2_CTL_14_DATA_HI:    .word 0x002a002a
 //0000000_000000000 dll_lock 0000000_000100100 dll_increment
-DDR2_CTL_15_DATA_LO:    .word 0x00000004
-//0000000_010110100 dqs_out_shift_bypass 0000000_010000111 dll_start_point 
-DDR2_CTL_15_DATA_HI:    .word 0x00b40020 
+DDR2_CTL_15_DATA_LO:    .word 0x00000001
+//0000000_010110100 dqs_out_shift_bypass 0000000_000110000 dll_start_point 
+//DDR2_CTL_15_DATA_HI:    .word 0x00b40030
+DDR2_CTL_15_DATA_HI:    .word 0x00420030  
 //000000_0000000000 int_ack 0000000_010000111 wr_dqs_shift_bypass
-DDR2_CTL_16_DATA_LO:    .word 0x00000087
+//DDR2_CTL_16_DATA_LO:    .word 0x00000087
+DDR2_CTL_16_DATA_LO:    .word 0x00000032
 //00000_00000000000 int_status 00000_00000000000 int_mask 
 DDR2_CTL_16_DATA_HI:    .word 0x000007ff #no_interrupt 
 //DDR2_CTL_16_DATA_HI:    .word 0x00000000 #no_masked
@@ -1894,4 +1897,3 @@ DDR2_CTL_28_DATA_HI:    .word 0x00000000
 DDR2_CTL_start_DATA_LO: .word 0x01000000
 //0000000_1 swap_port_rw_same_en 0000000_1 swap_en 0000000_0 start 0000000_0 srefresh
 DDR2_CTL_start_DATA_HI: .word 0x01010100 
-
