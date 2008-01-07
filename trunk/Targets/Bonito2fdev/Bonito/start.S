@@ -1743,7 +1743,6 @@ reg_write:
     la 		t0, DDR2_CTL_01_DATA_LO
     addu    t0, t0, s0
     ld		a1, 0x0(t0)
-	li 		a1, 0
     move	a0, sdCfg
     andi	a0, 0x10
     dsll	a0, a0, 28
