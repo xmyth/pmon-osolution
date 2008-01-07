@@ -1137,7 +1137,7 @@ rtl8139_attach_common(struct nic *nic, u_int8_t *enaddr)
 #else
 
 #ifndef EPLC46
-	if (read_eeprom (nic, ioaddr, 0) != 0x8129) 
+	if (read_eeprom (nic, ioaddr, 0) != 0x8129 || read_eeprom (nic, ioaddr, 9) == 0x135b) 
 #else
 	if (read_eeprom (nic, ioaddr, 0) != 0x29 &&
 			read_eeprom(nic, ioaddr, 1) != 0x81) 
@@ -1154,7 +1154,7 @@ rtl8139_attach_common(struct nic *nic, u_int8_t *enaddr)
 			0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000,
 			0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000,
 			0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000 ,0x0000};
-		t = tgt_gettime();;
+		t = tgt_gettime();
 		rom[9] = t & 0xffff;
 		printf("Invalid eeprom! word 0 = %x, Updated to default\n",read_eeprom(nic, ioaddr, 0));
 		for (i = 0; i < 64; i++)
