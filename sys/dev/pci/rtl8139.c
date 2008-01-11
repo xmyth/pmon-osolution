@@ -1137,7 +1137,7 @@ rtl8139_attach_common(struct nic *nic, u_int8_t *enaddr)
 #else
 
 #ifndef EPLC46
-	if (read_eeprom (nic, ioaddr, 0) != 0x8129 || read_eeprom (nic, ioaddr, 9) == 0x135b) 
+	if (read_eeprom (nic, ioaddr, 0) != 0x8129 || read_eeprom (nic, ioaddr, 9) == 0x135b || read_eeprom (nic, ioaddr, 9) == 0x2f89) 
 #else
 	if (read_eeprom (nic, ioaddr, 0) != 0x29 &&
 			read_eeprom(nic, ioaddr, 1) != 0x81) 
