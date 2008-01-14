@@ -448,6 +448,9 @@ locate:
     /******** added to init southbridge*/
 	/* Set HwMon base address */
 	ISABWWR_INIT(4, HWMON_IO_BASE_ADDR, HWMON_IO_BASE_VALUE | 0x1)	
+	/* Enable HwMon */
+	ISABWWR_INIT(4, HWMON_CONFIG_ADDR, HWMON_CONFIG_ENABLE_BIT)	
+	
 	/* Set the SMB base address */
 	ISABWWR_INIT(4, SMBUS_IO_BASE_ADDR, SMBUS_IO_BASE_VALUE | 0x1)
 	/* enable the host controller */
