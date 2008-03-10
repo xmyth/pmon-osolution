@@ -334,7 +334,7 @@ void vt82c686_init(void)
 	initIRQ();
 	//disable_usb();
 	enable_io_decode();
-	initUSB();
+	//initUSB();
 	myfixup();
 }
 
