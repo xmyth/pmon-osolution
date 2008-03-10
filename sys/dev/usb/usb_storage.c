@@ -68,6 +68,7 @@
 #include <sys/queue.h>
 #include <pmon.h>
 
+#include "mod_usb_ohci.h"
 #include "usb.h"
 #include "part.h"
 #include "scsi.h"
@@ -963,7 +964,7 @@ static int usb_read_10(ccb *srb,struct us_data *ss, unsigned long start, unsigne
 }
 
 
-#define USB_MAX_READ_BLK 16
+#define USB_MAX_READ_BLK 30
 
 extern int ohci_debug;
 unsigned long usb_stor_read(int device, unsigned long blknr, unsigned long blkcnt, unsigned long *buffer)
@@ -980,8 +981,8 @@ unsigned long usb_stor_read(int device, unsigned long blknr, unsigned long blkcn
 	device &= 0xff;
 	/* Setup  device
 	 */
-	//USB_STOR_PRINTF("\nusb_read: dev %d \n",device);
 #if NMOD_USB_OHCI
+	//USB_STOR_PRINTF("\nusb_read: dev %d \n",device);
 	if(ohci_debug)printf("\nusb_read: dev %d buffer %x\n",device, buffer);
 #endif
 	dev=NULL;
@@ -1053,8 +1054,8 @@ int usb_storage_probe(struct usb_device *dev, unsigned int ifnum,struct us_data 
 	/* let's examine the device now */
 	iface = &dev->config.if_desc[ifnum];
 
-#if 0
 	/* this is the place to patch some storage devices */
+#if 0
 	USB_STOR_PRINTF("iVendor %X iProduct %X\n",dev->descriptor.idVendor,dev->descriptor.idProduct);
 	if ((dev->descriptor.idVendor) == 0x066b && (dev->descriptor.idProduct) == 0x0103) {
 		USB_STOR_PRINTF("patched for E-USB\n");
@@ -1279,7 +1280,7 @@ static int usb_match(struct device *parent, void *match, void *aux)
 {
 	struct usb_device *dev = aux;
 
-	pci_sync_cache(0, &_usb_ccb, sizeof(_usb_ccb), 1);
+	pci_sync_cache(0, _usb_ccb, sizeof(_usb_ccb), 1);
 	usb_ccb = (ccb*)CACHED_TO_UNCACHED(&_usb_ccb);
 
 	if(usb_max_devs==USB_MAX_STOR_DEV) {
@@ -1389,7 +1390,7 @@ void usb_strategy(struct buf *bp)
 	/* If it's a null transfer, return immediately. */
 	if (bp->b_bcount == 0)
 		goto done;
-
+	
 	if(bp->b_flags & B_READ){
 		if((unsigned long)bp->b_data & (d_secsize - 1)){
 			ret = usb_stor_read(dev, blkno, blkcnt, (unsigned long *)bulkbuf); 
