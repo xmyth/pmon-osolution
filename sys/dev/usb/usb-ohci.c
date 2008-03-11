@@ -179,7 +179,7 @@ static void ohci_attach(struct device *parent, struct device *self, void *aux)
 
 #ifdef USB_OHCI_NO_ROM
 	val = pci_conf_read(ohci->sc_pc, pa->pa_tag, 0xe0);
-	pci_conf_write(ohci->sc_pc, pa->pa_tag, 0xe0, (val & ~0x7) | 0x4);
+	pci_conf_write(ohci->sc_pc, pa->pa_tag, 0xe0, (val & ~0x7) | 0x5);
 	pci_conf_write(ohci->sc_pc, pa->pa_tag, 0xe4, (1<<5));
 #endif
 	ohci->pa = pa;
