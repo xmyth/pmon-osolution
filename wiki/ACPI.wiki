@@ -1,6 +1,9 @@
 = ACPI reference Page =
+在这里我们存放一些ACPI相关的信息，作为我们STR实现的参考
 
+== Tips ==
 
+GetAcpiTable
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
