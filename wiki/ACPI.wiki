@@ -3,7 +3,7 @@
 
 == Tips ==
 
-GetDSDTTable
+  * HowToGetDSDTTable
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
