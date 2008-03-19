@@ -3,6 +3,5 @@
 ACPI reference Page
 
 = Useful Website =
-[http://www.acpi.info ACPI spec]
-
-
+* [http://www.acpi.info ACPI spec]
+* [http://coreboot.org coreboot (LinuxBios) project]
