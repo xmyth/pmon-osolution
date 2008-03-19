@@ -4,7 +4,7 @@
 == Tips ==
 
   * [HowToGetDSDTTable]
-  * [ACPI_in_coreboot]
+  * [ACPI_in_coreboot acpi in a8v-e_se]
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
