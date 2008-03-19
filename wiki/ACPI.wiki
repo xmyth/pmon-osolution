@@ -1,3 +1,4 @@
+﻿#summary 关于ACPI的总入口
 = ACPI reference Page =
 在这里我们存放一些ACPI相关的信息，作为我们STR实现的参考。在coreboot中有些主板支持了ACPI功能（可能只是部分支持），我大概看了一下，觉得 epia-m (via) 和 a8v-e_se (asus) 值得我们参考一下。
 
@@ -5,6 +6,7 @@
 
   * [HowToGetDSDTTable]
   * [ACPI_in_coreboot acpi in a8v-e_se]
+  * [ACPI_TABLE_SAMPLE]
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
