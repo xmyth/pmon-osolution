@@ -4,7 +4,7 @@
 == Tips ==
 
   * [HowToGetDSDTTable]
-  * [ACPI in coreboot]
+  * [ACPI_in_coreboot]
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
