@@ -11,4 +11,4 @@
   * [http://coreboot.org coreboot (LinuxBios) project]
 
 == Issue ==
-  * VGA Restore
+  * [VGA Restore]
