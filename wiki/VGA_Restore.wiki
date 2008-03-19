@@ -1,0 +1,4 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+在VGA恢复的过程,我们要特别关注.因为我们没有VGA BIOS芯片,而且是要通过一个x86模拟器来初始化VGA芯片的,在标准S3恢复过程中应该要特别处理.
