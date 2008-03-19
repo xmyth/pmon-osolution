@@ -15,7 +15,7 @@ Sometimes it is called SCI interrupt.
 Now you will need to create an ACPI table which describes the I/O port location for kernel ACPI implementation. This is the FACP table. You will need to create the fadt.c file and fill in 
 the IO port values plus IRQ:
 
-<pre>
+{{{
 fadt->sci_int = 9;
 fadt->pm1a_evt_blk = VT8237R_ACPI_IO_BASE;
 fadt->pm1b_evt_blk = 0x0;
@@ -25,7 +25,7 @@ fadt->pm2_cnt_blk = 0x0;
 fadt->pm_tmr_blk = VT8237R_ACPI_IO_BASE + 0x8;
 fadt->gpe0_blk = VT8237R_ACPI_IO_BASE + 0x20;
 fadt->gpe1_blk = 0x0;
-</pre>
+}}}
 
 In this example the ACPI IRQ is 9, and the PM1A event block start at VT8237R_ACPI_IO_BASE. You 
 may obtain some values from cat /proc/ioport if running with proprietary BIOS. Not all blocks
@@ -40,16 +40,16 @@ ACPI routing information in _PRT methods. You may add those _PRT methods later.
 
 Very generic DSDT table would look like in similar way how it is ASUS A8V-E (dsdt.asl).
 
-<pre>
+{{{
         Scope (\_PR)
         {
                 Processor (\_PR.CPU0, 0x00, 0x000000, 0x00) {}
                 Processor (\_PR.CPU1, 0x01, 0x000000, 0x00) {}
         }
-</pre>
+}}}
 
 This is here for compatibility. More interesting is:
-<pre>
+{{{
 
         /* For now only define 2 power states:
          *  - S0 which is fully on
@@ -58,30 +58,30 @@ This is here for compatibility. More interesting is:
          */
         Name (\_S0, Package () {0x00, 0x00, 0x00, 0x00 })
         Name (\_S5, Package () {0x02, 0x02, 0x00, 0x00 })
-</pre>
+}}}
 
 This defines the SLP_TYP fields in PM1A register. In my case I need to store 010 to perform soft off.
 And 000 to wakeup. Modify it to fit your chipset needs. Rest of the files is quite generic, except the _PRT methods which define the routing.
 
-<pre>
+{{{
      Package (0x04) { 0x000BFFFF, 0x00, 0x00, 0x10 }, //slot 0xB
      Package (0x04) { 0x000BFFFF, 0x01, 0x00, 0x11 },
      Package (0x04) { 0x000BFFFF, 0x02, 0x00, 0x12 },
      Package (0x04) { 0x000BFFFF, 0x03, 0x00, 0x13 },
-</pre>
+}}}
 
 This defines the slot 0xB (all functions FFFF) routing as follows :
-<pre>
+{{{
 INTA -> IRQ16
 INTB -> IRQ17
 INTC -> IRQ18
 INTD -> IRQ19
-</pre>
+}}}
 
 You may also just state just one state/function:
-<pre>
+{{{
 Package (0x04) { 0x000F0001, 0x00, 0x00, 0x14 }, //0xf NAtive IDE IRQ 20
-</pre>
+}}}
 
 This means 0:0f.1 INTA is routed to IRQ20.
 
