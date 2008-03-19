@@ -1,4 +1,149 @@
 ﻿#summary some acpi table sample
+
+这些ACPI表是从一台PC（SB为686B）上dump出来的，机器上的一些信息如下:
+{{{
+$ more interrupts 
+           CPU0       
+  0:    1624920    XT-PIC-XT        timer
+  1:       9880    XT-PIC-XT        i8042
+  2:          0    XT-PIC-XT        cascade
+  3:          1    XT-PIC-XT        acpi
+  5:     979115    XT-PIC-XT        uhci_hcd:usb1, uhci_hcd:usb2, uhci_hcd:usb4, nvidia
+  7:         51    XT-PIC-XT        ehci_hcd:usb5
+  8:          3    XT-PIC-XT        rtc
+ 10:      54908    XT-PIC-XT        eth1
+ 11:       5601    XT-PIC-XT        uhci_hcd:usb3, VIA686A
+ 12:          4    XT-PIC-XT        i8042
+ 14:      55800    XT-PIC-XT        ide0
+ 15:      95234    XT-PIC-XT        ide1
+NMI:          0 
+LOC:          0 
+ERR:          0
+MIS:          0
+$ more iomem 
+00000000-0009fbff : System RAM
+  00000000-00000000 : Crash kernel
+0009fc00-0009ffff : reserved
+000a0000-000bffff : Video RAM area
+000c0000-000cc3ff : Video ROM
+000d0000-000d3fff : pnp 00:00
+000f0000-000fffff : System ROM
+00100000-2ffeffff : System RAM
+  00100000-002f7e85 : Kernel code
+  002f7e86-003dce83 : Kernel data
+2fff0000-2fff2fff : ACPI Non-volatile Storage
+2fff3000-2fffffff : ACPI Tables
+40000000-4000ffff : 0000:00:0d.0
+d0000000-d7ffffff : PCI Bus #01
+  d0000000-d7ffffff : 0000:01:00.0
+d8000000-dbffffff : 0000:00:00.0
+dc000000-ddffffff : PCI Bus #01
+  dc000000-dcffffff : 0000:01:00.0
+    dc000000-dcffffff : nvidia
+  dd000000-dd00ffff : 0000:01:00.0
+df000000-df0000ff : 0000:00:0d.0
+  df000000-df0000ff : 8139too
+df001000-df0010ff : 0000:00:0a.2
+  df001000-df0010ff : ehci_hcd
+ffff0000-ffffffff : reserved
+
+$ more ioports 
+0000-001f : dma1
+0020-0021 : pic1
+0040-0043 : timer0
+0050-0053 : timer1
+0060-006f : keyboard
+0070-0077 : rtc
+0080-008f : dma page reg
+00a0-00a1 : pic2
+00c0-00df : dma2
+00f0-00ff : fpu
+0170-0177 : 0000:00:07.1
+  0170-0177 : ide1
+01f0-01f7 : 0000:00:07.1
+  01f0-01f7 : ide0
+0376-0376 : 0000:00:07.1
+  0376-0376 : ide1
+03c0-03df : vga+
+03f6-03f6 : 0000:00:07.1
+  03f6-03f6 : ide0
+03f8-03ff : serial
+0cf8-0cff : PCI conf1
+4000-4003 : ACPI PM1a_EVT_BLK
+4008-400b : ACPI PM_TMR
+4020-4023 : ACPI GPE0_BLK
+40f0-40f1 : ACPI PM1a_CNT_BLK
+5000-500f : 0000:00:07.4
+  5000-5007 : vt596_smbus
+6000-607f : 0000:00:07.4
+  6000-607f : via686a
+c000-c00f : 0000:00:07.1
+  c000-c007 : ide0
+  c008-c00f : ide1
+c400-c41f : 0000:00:07.2
+  c400-c41f : uhci_hcd
+c800-c81f : 0000:00:07.3
+  c800-c81f : uhci_hcd
+cc00-ccff : 0000:00:07.5
+  cc00-ccff : VIA686A
+d000-d003 : 0000:00:07.5
+  d000-d003 : VIA686A
+d400-d403 : 0000:00:07.5
+  d400-d403 : VIA686A
+d800-d81f : 0000:00:0a.0
+  d800-d81f : uhci_hcd
+dc00-dc1f : 0000:00:0a.1
+  dc00-dc1f : uhci_hcd
+e000-e0ff : 0000:00:0d.0
+  e000-e0ff : 8139too
+
+$ dmesg |grep ACPI
+[    0.000000]  BIOS-e820: 000000002fff0000 - 000000002fff3000 (ACPI NVS)
+[    0.000000]  BIOS-e820: 000000002fff3000 - 0000000030000000 (ACPI data)
+[    0.000000] ACPI: RSDP signature @ 0xC00F78C0 checksum 0
+[    0.000000] ACPI: RSDP 000F78C0, 0014 (r0 VIA694)
+[    0.000000] ACPI: RSDT 2FFF3000, 0028 (r1 VIA694 MSI ACPI 42302E31 AWRD        0)
+[    0.000000] ACPI: FACP 2FFF3040, 0074 (r1 VIA694 MSI ACPI 42302E31 AWRD        0)
+[    0.000000] ACPI: DSDT 2FFF30C0, 27BE (r1 VIA694 AWRDACPI     1000 MSFT  100000C)
+[    0.000000] ACPI: FACS 2FFF0000, 0040
+[    0.000000] ACPI: PM-Timer IO Port: 0x4008
+[   40.810240] ACPI: Core revision 20070126
+[   40.810405] ACPI: Looking for DSDT in initramfs... error, file /DSDT.aml not found.
+[   40.811916] ACPI: setting ELCR to 0008 (from 0ca8)
+[   40.814911] ACPI: bus type pci registered
+[   40.852651] ACPI: EC: Look up EC in DSDT
+[   40.856347] ACPI: Interpreter enabled
+[   40.856353] ACPI: (supports S0 S1 S4 S5)
+[   40.856378] ACPI: Using PIC for interrupt routing
+[   40.860743] ACPI: PCI Root Bridge [PCI0] (0000:00)
+[   40.861498] ACPI: PCI Interrupt Routing Table [\_SB_.PCI0._PRT]
+[   40.878315] ACPI: PCI Interrupt Link [LNKA] (IRQs 1 3 4 *5 6 7 10 11 12 14 15)
+[   40.878513] ACPI: PCI Interrupt Link [LNKB] (IRQs 1 3 4 5 6 *7 10 11 12 14 15)
+[   40.878713] ACPI: PCI Interrupt Link [LNKC] (IRQs 1 3 4 5 6 7 *10 11 12 14 15)
+[   40.878907] ACPI: PCI Interrupt Link [LNKD] (IRQs 1 3 4 5 6 7 10 *11 12 14 15)
+[   40.879053] pnp: PnP ACPI init
+[   40.879076] ACPI: bus type pnp registered
+[   40.881505] pnp: PnP ACPI: found 9 devices
+[   40.881509] ACPI: ACPI bus type pnp unregistered
+[   40.881517] PnPBIOS: Disabled by ACPI PNP
+[   40.881618] PCI: Using ACPI for IRQ routing
+[   46.906562] ACPI: PCI Interrupt Link [LNKA] enabled at IRQ 5
+[   46.906577] ACPI: PCI Interrupt 0000:00:07.2[D] -> Link [LNKA] -> GSI 5 (level, low) -> IRQ 5
+[   47.009151] ACPI: PCI Interrupt 0000:00:07.3[D] -> Link [LNKA] -> GSI 5 (level, low) -> IRQ 5
+[   47.113694] ACPI: PCI Interrupt Link [LNKD] enabled at IRQ 11
+[   47.113711] ACPI: PCI Interrupt 0000:00:0a.0[A] -> Link [LNKD] -> GSI 11 (level, low) -> IRQ 11
+[   47.216890] ACPI: PCI Interrupt 0000:00:0a.1[B] -> Link [LNKA] -> GSI 5 (level, low) -> IRQ 5
+[   47.321609] ACPI: PCI Interrupt Link [LNKB] enabled at IRQ 7
+[   47.321625] ACPI: PCI Interrupt 0000:00:0a.2[C] -> Link [LNKB] -> GSI 7 (level, low) -> IRQ 7
+[   47.469779] ACPI: PCI Interrupt Link [LNKC] enabled at IRQ 10
+[   47.469796] ACPI: PCI Interrupt 0000:00:0d.0[A] -> Link [LNKC] -> GSI 10 (level, low) -> IRQ 10
+[   59.262943] ACPI: PCI Interrupt 0000:01:00.0[A] -> Link [LNKA] -> GSI 5 (level, low) -> IRQ 5
+[   60.030878] ACPI: PCI Interrupt 0000:00:07.5[C] -> Link [LNKD] -> GSI 11 (level, low) -> IRQ 11
+[   64.485029] ACPI: Power Button (FF) [PWRF]
+[   64.542439] ACPI: Power Button (CM) [PWRB]
+[   64.570451] ACPI: Sleep Button (CM) [SLPB]
+}}}
+
 =DSDT=
 {{{
 /*
@@ -3285,5 +3430,3 @@ Raw Table Data
   0020: 00 00 00 00 40 30 FF 2F                          ....@0./
 
 }}}
-
-
