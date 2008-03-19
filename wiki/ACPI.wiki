@@ -1,5 +1,5 @@
 = ACPI reference Page =
-在这里我们存放一些ACPI相关的信息，作为我们STR实现的参考。在coreboot中有些主板支持了ACPI功能（可能只是部分支持），我大概看了一下，觉得 epia-m [via] 和 a8v-e_se [asus] 值得我们参考一下。
+在这里我们存放一些ACPI相关的信息，作为我们STR实现的参考。在coreboot中有些主板支持了ACPI功能（可能只是部分支持），我大概看了一下，觉得 epia-m (via) 和 a8v-e_se (asus) 值得我们参考一下。
 
 == Tips ==
 
@@ -11,4 +11,4 @@
   * [http://coreboot.org coreboot (LinuxBios) project]
 
 == Issue ==
-  * [VGA Restore]
+  * [VGA_Restore]
