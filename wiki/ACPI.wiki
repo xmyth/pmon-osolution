@@ -7,6 +7,7 @@
   * [HowToGetDSDTTable]
   * [ACPI_in_coreboot acpi in a8v-e_se]
   * [ACPI_TABLE_SAMPLE]
+  * AcpiTool
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
