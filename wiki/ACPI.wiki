@@ -11,7 +11,7 @@
 
 == 分析 ==
 
-  * [Acpi_In_epia-m]
+  * [AcpiInepia acpi in epia-m]
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
