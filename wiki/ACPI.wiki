@@ -12,6 +12,7 @@
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
   * [http://coreboot.org coreboot (LinuxBios) project]
+  * [http://blog.chinaunix.net/u/7356/showart_370384.html BIOS ACPI TABLE]
 
 == Issue ==
   * [VGA_Restore]
