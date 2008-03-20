@@ -9,6 +9,10 @@
   * [ACPI_TABLE_SAMPLE]
   * AcpiTool
 
+== 分析 ==
+
+  * [epia-m中ACPI实现分析]
+
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
   * [http://coreboot.org coreboot (LinuxBios) project]
