@@ -125,6 +125,4 @@ unsigned long write_acpi_tables(unsigned long start)
 }}}
 这里先写了RSDT和RSDP，然后添加了FADT, FACS, DSDT。
 
-从这里看来基本的ACPI的实现在BIOS这里，主要是要表这些表填好。
-
-
+从这里看来基本的ACPI的实现在BIOS这里，主要是要把这些表填好。
