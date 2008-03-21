@@ -17,6 +17,7 @@
   * [http://www.acpi.info ACPI spec]
   * [http://coreboot.org coreboot (LinuxBios) project]
   * [http://blog.chinaunix.net/u/7356/showart_370384.html BIOS ACPI TABLE]
+  * [http://wiki.zh-kernel.org/project/linux-acpi linux acpi]
 
 == Issue ==
   * [VGA_Restore]
