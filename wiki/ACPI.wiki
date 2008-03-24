@@ -21,5 +21,6 @@
   * [http://lwn.net/Articles/144193/ Kernel Summit 2005: The power management summit]
   * [http://lwn.net/Articles/243404/ Suspend and hibernation status report]
   * [http://lkml.org/lkml/2006/7/25/105 swsusp status report]
+  * [http://www.patentgenius.com/patent/6446213.html Software-based sleep control]
 == Issue ==
   * [VGA_Restore]
