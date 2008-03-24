@@ -18,6 +18,7 @@
   * [http://coreboot.org coreboot (LinuxBios) project]
   * [http://blog.chinaunix.net/u/7356/showart_370384.html BIOS ACPI TABLE]
   * [http://wiki.zh-kernel.org/project/linux-acpi linux acpi]
+  * [http://lwn.net/Articles/144193/ Kernel Summit 2005: The power management summit]
 
 == Issue ==
   * [VGA_Restore]
