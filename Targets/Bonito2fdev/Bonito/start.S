@@ -1688,7 +1688,7 @@ reg_write:
     ld		a1, 0x0(t0)
     move		a0, sdCfg
     
-    li	a0, 0xf
+    andi	a0, 0xf
 	
     sll		a0, 16    
     or		a1, a0
