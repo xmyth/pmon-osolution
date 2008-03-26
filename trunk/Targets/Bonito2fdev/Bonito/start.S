@@ -1687,25 +1687,12 @@ reg_write:
     addu    	t0, t0, s0
     ld		a1, 0x0(t0)
     move		a0, sdCfg
-    andi	a0,	0xf
-    beq	    a0,0x1,1f
-    nop
-    beq		a0,0x2,2f
-    nop
-    beq		a0,0x3,3f
-    nop
-    b		5f
-    nop
-1:  and		a1, 0xfff1ffff
-    b		5f
-    nop
-2:  and		a1, 0xfff3ffff
-    b		5f
-    nop
-3:  and		a1, 0xfff7ffff
-    b		5f
-    nop
-5:  
+    
+    li	a0, 0xf
+	
+    sll		a0, 16    
+    or		a1, a0
+
     sd	    a1, 0x70(t2)
     move 	a0, a1
     move	t7, ra
@@ -1811,7 +1798,7 @@ DDR2_CTL_06_DATA_LO:    .word 0x03050203
 //0000_1010 aprebit 00000_100 wrlat 00000_100 twtr 00000_110 twr_int  
 DDR2_CTL_06_DATA_HI:    .word 0x0a040406 #CL=5
 //0000_0000 ecc_c_id 0000_1111 cs_map 0000_1010 caslat_lin_gate 0000_1011 caslat_lin 
-DDR2_CTL_07_DATA_LO:    .word 0x000f0a0b #CL=5//cs_map to cs0-cs3
+DDR2_CTL_07_DATA_LO:    .word 0x00000a0b #CL=5//cs_map to cs0-cs3
 //0000_0000 max_row_reg 0000_0000 max_col_reg 0000_0100 initaref 0000_0000 ecc_u_id 
 DDR2_CTL_07_DATA_HI:    .word 0x00000400
 //0000_0000 odt_rd_map_cs3 0000_0000 odt_rd_map_cs2 0000_0000 odt_rd_map_cs1 0000_0000 odt_rd_map_cs0 
