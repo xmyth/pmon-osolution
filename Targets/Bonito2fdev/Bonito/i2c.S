@@ -19,7 +19,7 @@
 	b 2f
 	nop
 1:
-	or  	sdCfg, 0x1<<29
+	/*or  	sdCfg, 0x1<<29*/
 	nop
 	li a0,0xa1
 	bal ii2c_cfg
@@ -49,9 +49,32 @@
 	nop
 
 2:
+	PRINTSTR("Memory Size = ")
+	move	a0, msize
+	bal 	hexserial
+	nop
+	PRINTSTR("\r\n")
+
+	
+/*	Start write MAX8713 value */
+
+	li	a0, 0x12
+	li	a1, 0x14	//ChargeCurrent
+	li 	t0, 0x07e0			
+
+	bal i2cwrite
+	nop
+
+	li	a0, 0x12
+	li	a1,	0x15	//ChargeVoltage
+	li 	t0, 0x3130
+
+	bal i2cwrite
+	nop
+	
 	b 211f
 	nop
-/*ic2 cfg
+/*i2c cfg
 * a0=0xa1 for slot 0,a0=0xa3 for slot 1
 * t5 used for save i2c addr a0,t6 save ra.
 */
@@ -80,15 +103,15 @@ LEAF(ii2c_cfg)
        
 	/* read Module Rank Density */
 	PRINTSTR("Read Module Rank Density at 0x1f\r\n")
-	move	a0,t5	/* #zgj-11-17 */
-	li	a1,0x1f
+	move	a0, t5
+	li	a1, 0x1f
 	bal	i2cread
 	nop
 	move 	v1, v0
 	andi	v1, 0x1
 	beqz	v1, 1f
 	nop
-	li 	msize, 0x40000000 
+	li 	t8, 0x40000000 
 	//1G
 	b	9f
 	nop
@@ -96,7 +119,7 @@ LEAF(ii2c_cfg)
 	andi	v1, 0x2 
 	beqz	v1, 2f
 	nop
-	li 	msize, 0x80000000 
+	li 	t8, 0x80000000 
 	//2G
 	b	9f
 	nop
@@ -104,7 +127,7 @@ LEAF(ii2c_cfg)
 	andi	v1, 0x4 
 	beqz	v1, 3f
 	nop
-	li 	msize, 0x100000000 
+	li 	t8, 0x100000000 
 	//4G
 	b	9f
 	nop
@@ -112,7 +135,7 @@ LEAF(ii2c_cfg)
 	andi	v1, 0x8 
 	beqz	v1, 4f
 	nop
-	li 	msize, 0x400000000 
+	li 	t8, 0x400000000 
 	//8G
 	b	9f
 	nop
@@ -120,7 +143,7 @@ LEAF(ii2c_cfg)
 	andi	v1, 0x10 
 	beqz	v1, 5f
 	nop
-	li 	msize, 0x800000000 
+	li 	t8, 0x800000000 
 	//16G
 	b	9f
 	nop
@@ -128,7 +151,7 @@ LEAF(ii2c_cfg)
 	andi	v1, 0x20 
 	beqz	v1, 6f
 	nop
-	li 	msize, 0x8000000 
+	li 	t8, 0x8000000 
 	//128M
 	b	9f
 	nop
@@ -136,7 +159,7 @@ LEAF(ii2c_cfg)
 	andi	v1, 0x40 
 	beqz	v1, 7f
 	nop
-	li 	msize, 0x10000000 
+	li 	t8, 0x10000000 
 	//256M
 	b	9f
 	nop
@@ -144,7 +167,7 @@ LEAF(ii2c_cfg)
 	andi	v1, 0x80 
 	beqz	v1, 9f
 	nop
-	li 	msize, 0x20000000 
+	li 	t8, 0x20000000 
 	//512M
 	b	9f
 	nop
@@ -155,55 +178,67 @@ LEAF(ii2c_cfg)
 
 	/* read Number of DIMM Ranks*/
 	PRINTSTR("Read Number of DIMM Ranks at 0x5\r\n")
-    move    a0,t5  
-	li	a1,5
+    	move    a0, t5  
+	li	a1, 5
 	bal	i2cread
 	nop
 	andi	v0, 0xf
-	move 	sdCfg, v0
-	addi	sdCfg, 1
-	mul	msize, sdCfg
+	addi	v0, 1
+	mul	t8, v0
+	add	msize, t8
+	beq	v0, 1, 1f
+	nop
+	addi	v0, 1
+1:		
+	beq	t5,0xa3,1f	//DIMM1
+	nop
+	or	sdCfg, v0	//DIMM0 CS
+	bal 	2f
+	nop
+1:	sll	v0, 2
+	or	sdCfg, v0	//DIMM1 CS
+2:
 	nop
 
 	/* read Row Number of DIMM Ranks*/
 	PRINTSTR("Read Row Number of DIMM Ranks at 0x3\r\n")
-   	move    a0,t5  
-	li	a1,3
+   	move    a0, t5  
+	li	a1, 3
 	bal	i2cread
 	nop
 	andi	v0, 0xf
-	sll		v0, v0,12
-	or		sdCfg, v0
+	sll	v0, v0,12
+	or	sdCfg, v0
 	nop
 	
 	/* read Col Number of DIMM Ranks*/
 	PRINTSTR("Read Col Number of DIMM Ranks at 0x4\r\n")
-    move    a0,t5  
-	li	a1,4
+    	move    a0, t5  
+	li	a1, 4
 	bal	i2cread
 	nop
 	andi	v0, 0xf
-	sll		v0, v0, 8
-	or		sdCfg, v0
+	sll	v0, v0, 8
+	or	sdCfg, v0
 	nop
 
 	/* read Number of Banks*/
 	PRINTSTR("Read Number of Banks at 17\r\n")
-    move    a0,t5  
+    	move    a0, t5  
 	li	a1, 0x11
 	bal	i2cread
 	nop
 	andi	v0, 0xf
-	srl		v0, v0, 3
-	sll		v0, v0, 4
-	or		sdCfg, v0
+	srl	v0, v0, 3
+	sll	v0, v0, 4
+	or	sdCfg, v0
 	nop
 
 	andi	v0, 0x8
 	beqz	v0, 1f
 	nop
-	li		v0, 0x10
-	or		sdCfg, v0
+	li	v0, 0x10
+	or	sdCfg, v0
 1:	
 
 	PRINTSTR("\r\nDDR Cfg = ")
@@ -211,32 +246,6 @@ LEAF(ii2c_cfg)
 	bal 	hexserial
 	nop
 	PRINTSTR("\r\n")
-
-#####################################################
-	PRINTSTR("Memory Size = ")
-	move	a0, msize
-	bal 	hexserial
-	nop
-	PRINTSTR("\r\n")
-
-	
-/*	Start write MAX8713 value */
-
-	li	a0, 0x12
-	li	a1, 0x14	//ChargeCurrent
-	li 	t0, 0x07e0			
-
-	bal i2cwrite
-	nop
-
-	li	a0, 0x12
-	li	a1,	0x15	//ChargeVoltage
-	li 	t0, 0x3130
-
-	bal i2cwrite
-	nop
-	
-
 	
 	jr t6
 	nop
