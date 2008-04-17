@@ -5,6 +5,17 @@
 
 #include "ST7FLI49MK1T6.h"
 #include "common.h"
+#include "eeprom.h"
+
+extern void eeprom_init(void);
+extern void eeprom_update_status(PM_STATUS);
+extern void sys_poweron(void);
+extern void sys_poweroff(void);
+extern void sys_init(void);
+
+PM_STATUS eeprom_get_status();
+
+extern unsigned char g_pm_status_his;
 
 void sys_init(void);
 

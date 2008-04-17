@@ -1,4 +1,5 @@
 #include "ST7FLI49MK1T6.h"
+#include "common.h"
 #include "eeprom.h"
 
 /*
@@ -43,6 +44,7 @@ static unsigned char eeprom_data[] =
 	0x00  // CHECK_SUM
 };
 
+unsigned char g_pm_status_his = 0;
 
 void eeprom_init() {
 	
@@ -52,13 +54,15 @@ void eeprom_init() {
 
 	if (       (eeprom_data[IDX_VENDOR_ID] != E_VENDOR_ID) 
 			|| (eeprom_data[IDX_LENGTH]    != E_LENGTH) 
-			|| (crc8_calc(0, &E_EEPROM_START, E_LENGTH) != E_CHECKSUM) 
-			|| (PM_STATUS)(E_PM_STATUS) != PM_STATUS_POWEROFF)
-	{
+			|| (crc8_calc(0, &E_EEPROM_START, E_LENGTH) != E_CHECK_SUM) 
+			|| (PM_STATUS)(E_PM_STATUS) != PM_STATUS_POWEROFF) {
+				
 		g_pm_status_his = PM_STATUS_ABNORMAL;
 
 	} else {
+		
 		g_pm_status_his = E_PM_STATUS;
+		
 	}
 }
 
@@ -74,8 +78,8 @@ int eeprom_write(unsigned char offset, unsigned char *buf, unsigned char length)
 
 	/* writing */
 
-	SetBit (EECSR, E2LAT);
-	ClrBit (EECSR, E2PGM);
+	SetBit (EECSR, EECSR_E2LAT);
+	ClrBit (EECSR, EECSR_E2PGM);
 
 	for (i = 0; i < length; i++)
 	{
@@ -100,6 +104,7 @@ void eeprom_update_status(PM_STATUS pm_status) {
 	eeprom_data[IDX_CHECKSUM] = crc8_calc(0, eeprom_data, sizeof(eeprom_data) - 1);
 
 	eeprom_write(0, eeprom_data, sizeof(eeprom_data));
+	
 }
 
 PM_STATUS eeprom_get_status(void) {

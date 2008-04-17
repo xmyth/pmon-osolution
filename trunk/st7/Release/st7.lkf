@@ -26,6 +26,7 @@ crtsi.st7
 
 # Put your object files here (they depend on you application)
 #<BEGIN OBJECT_FILES>
+Release\eeprom.o
 Release\main.o
 #<END OBJECT_FILES>
 
