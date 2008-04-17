@@ -5,6 +5,7 @@
 
 extern void _stext();		/* startup routine */  
 
+extern void LT2_RTC_INT(void);
 
 
 @interrupt void NonHandledInterrupt (void)
@@ -22,7 +23,7 @@ void (* const _vectab[])() = {
 	NonHandledInterrupt,  		/* 0xFFE0 */
 	NonHandledInterrupt,			/* 0xFFE2 */
 	NonHandledInterrupt,			/* 0xFFE4 */
-	NonHandledInterrupt,			/* 0xFFE6 */
+	LT2_RTC_INT,							/* 0xFFE6 */
 	NonHandledInterrupt,			/* 0xFFE8 */
 	NonHandledInterrupt,			/* 0xFFEA */
 	NonHandledInterrupt,			/* 0xFFEC */
