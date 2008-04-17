@@ -3,3 +3,9 @@
 [Version]
 Keyword=ST7Project
 Number=1.3
+
+[Root.Source Files.interrupt_vector.c.Config.0]
+ExternDep= interrupt_vector.c  "C:\Program Files\COSMIC\CXST7_16K\Hst7\modm.h"
+
+[Root.Source Files.main.c.Config.0]
+ExternDep= main.c "C:\Program Files\COSMIC\CXST7_16K\Hst7\modm.h"  ST7FLI49MK1T6.h common.h
