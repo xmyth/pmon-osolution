@@ -13,5 +13,6 @@
 #define DisableInterrupts {_asm ("SIM");} 
 #define Nop {_asm ("nop");} 
 #define WaitforInterrupt {_asm ("wfi");} 
+#define Trap {_asm ("trap"); }
 
 #endif

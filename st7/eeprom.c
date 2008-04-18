@@ -2,6 +2,9 @@
 #include "common.h"
 #include "eeprom.h"
 
+static unsigned char crc8_calc(unsigned char val, unsigned char *ptr, int length);
+static unsigned char crc8_calc2(unsigned char val, unsigned char *ptr, int length);
+
 /*
  * crc8 table
  */
@@ -46,7 +49,7 @@ static unsigned char eeprom_data[] =
 
 unsigned char g_pm_status_his = PM_STATUS_ABNORMAL;
 
-void eeprom_init() {
+PM_STATUS eeprom_init() {
 	
 	/*
 	 *  verify failed
@@ -54,14 +57,14 @@ void eeprom_init() {
 
 	if (       (eeprom_data[IDX_VENDOR_ID] != E_VENDOR_ID) 
 			|| (eeprom_data[IDX_LENGTH]    != E_LENGTH) 
-			|| (crc8_calc(0, &E_EEPROM_START, E_LENGTH) != E_CHECK_SUM) 
+			|| (crc8_calc2(0, &E_EEPROM_START, E_LENGTH) != E_CHECK_SUM) 
 			|| (PM_STATUS)(E_PM_STATUS) != PM_STATUS_POWEROFF) {
 				
-		g_pm_status_his = PM_STATUS_ABNORMAL;
+		return PM_STATUS_ABNORMAL;
 
 	} else {
 		
-		g_pm_status_his = E_PM_STATUS;
+		return E_PM_STATUS;
 		
 	}
 }
@@ -114,13 +117,25 @@ PM_STATUS eeprom_get_status(void) {
 unsigned char crc8_calc(unsigned char val, unsigned char *ptr, int length) {
 
 	unsigned char a = val;
-    int i = length;
+	int i = length;
 
-    while (i > 0) {
+	while (i > 0) {
 		a = crctab [ a ^ *ptr ];
 		ptr++;
 		i--;
-    }
-    return a;
+	}
+	return a;
 }
 
+unsigned char crc8_calc2(unsigned char val, unsigned char *ptr, int length) {
+
+	unsigned char a = val;
+	int i = length;
+
+	while (i > 0) {
+		a = crctab [ a ^ *ptr ];
+		ptr++;
+		i--;
+	}
+	return a;
+}
