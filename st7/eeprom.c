@@ -44,7 +44,7 @@ static unsigned char eeprom_data[] =
 	0x00  // CHECK_SUM
 };
 
-unsigned char g_pm_status_his = 0;
+unsigned char g_pm_status_his = PM_STATUS_ABNORMAL;
 
 void eeprom_init() {
 	
