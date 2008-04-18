@@ -22,7 +22,7 @@ Date :18/07/2003                  Release:1.0
 
 #define NULL 0
 extern void SMBS_IT_Function();
-extern void i2c_rt();
+extern void I2C_INT(void);
 extern void LT2_RTC2_INT(void);
 extern void LT2_RTC_INT(void);
 
@@ -34,10 +34,7 @@ void (* const _vectab[])() = {
 					NULL,			/* 0xFFE4 */
 					LT2_RTC_INT,			        /* 0xFFE6 */
 					
-					//NULL,			/* 0xFFEA */
-					i2c_rt,			/* 0xFFE8 */
-					
-					
+					I2C_INT,			/* 0xFFE8 */
 					NULL,			/* 0xFFEA */
 					NULL,			/* 0xFFEC */
 					NULL,			/* 0xFFEE */

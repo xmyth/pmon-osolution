@@ -1,7 +1,7 @@
 [DebugState_v1-Debug.DebugContext]
 DumpRWOnFly=0
-WatchVariables1=SMBS_SR1!0;SMBS_SR2!0;index!0;tab!0;
-FormatWatch1=0
+WatchVariables1=SMBS_SR1!1;SMBS_SR2!0;index!0;tab!0;i!0;stat!0;SMBS_SR2!1;
+FormatWatch1=1
 FormatViewType1=1
 FormatViewAddress1=1
 WatchRWOnFlyTab1=0
@@ -24,6 +24,8 @@ FormatLocals=0
 FormatParameters=0
 [DebugState_v1-Debug.AddOn.St7Registers]
 ActiveTab=1
+HexaTimeDisplay=1
+HexaInstrTimeDisplay=1
 [DebugState_v1-Debug.AddOn.St7PeripheralRegister]
 DisplayFormat=1
 ShowPeriphAddress=0
@@ -31,6 +33,37 @@ ShowRegisterAddress=1
 [DebugState_v1-Debug.AddOn.St7McuIcdConf]
 McuName=ST7FLI49M
 [DebugState_v1-Debug.AddOn.IcdBreak]
-ICDBreak0=CR:0,BK1:0,BK2:0
+ICDBreak0=CR:0x00000000,BK1:0x0000ffff,BK2:0x00007fc1
 [DebugState_v1-Debug.AddOn.SteppingMode]
 Mode=hardware
+[DebugState_v1-Debug.AddOn.ST7LoadSaveConfiguration]
+RestoreSP_Control=1
+[DebugState_v1-Debug.AddOn.St7Watchpoint]
+NbDataBreakpoint=0
+[DebugState_v1-Debug.AddOn.St7McuOptionsMemMap]
+McuName=ST7FLITE49M
+CurrentEmuTypeAndName=ST7 simulator
+NbMcuOption=6
+McuOption0=gdi mcuoption -set Vdd 5.0V
+McuOption1=gdi mcuoption -set Fosc 16MHz
+McuOption2=gdi mcuoption -set INTERRUPT NESTED
+McuOption3=gdi mcuoption -set WATCHDOG SOFTWARE
+McuOption4=gdi mcuoption -set WDG_HALT RESET
+McuOption5=gdi mcuoption -set IRQ_SENSITIVITY RISING_AND_FALLING_EDGE
+NbRange=10
+Range0=mcumap -set [0x0000-0x007f]:"PERIPHERALS"
+Range1=mcumap -set [0x0080-0x017f]:"RAM"
+Range2=mcumap -set [0x0180-0x01ff]:"STACK"
+Range3=mcumap -set [0x0200-0x0fff]:"RESERVED"
+Range4=mcumap -set [0x1000-0x107f]:"EEPROM"
+Range5=mcumap -set [0x1080-0xdedf]:"RESERVED"
+Range6=mcumap -set [0xdee0-0xdee3]:"ROM"
+Range7=mcumap -set [0xdee4-0xefff]:"RESERVED"
+Range8=mcumap -set [0xf000-0xffdf]:"ROM"
+Range9=mcumap -set [0xffe0-0xffff]:"VECTORS"
+[DebugState_v1-Debug.AddOn.St7StackPtrControl]
+SP_Ctrl_Enable=
+SP_Ctrl_OverFlow=
+[DebugState_v1-Debug.AddOn.Plotter]
+data=504103000000000000006C
+xml_checksum=135

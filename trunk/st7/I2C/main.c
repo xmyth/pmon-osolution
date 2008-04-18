@@ -53,10 +53,14 @@ void main()
 	LTCSR2;         // 需要先读一次LTCSR2 寄存器，才可以在开发环境中中断。
 	LTCSR2 = 0x02; 	//LTCSR2: 0 0 0 0 0 0 TB2IE TB2F
 	
-{
-	unsigned char i,j;
+     ClrBit(PADDR, 6);
+		 ClrBit(PADDR, 7);
+		 ClrBit(PAOR, 6);
+		 ClrBit(PAOR, 7);	//Floating Input	
+	
 
-     SetBit(PADDR, 4);
+			
+   SetBit(PADDR, 4);
 		 SetBit(PAOR, 4);
 		 ClrBit (PADR, 4);
 		 
@@ -65,54 +69,17 @@ void main()
 		 ClrBit (PADR, 5);
 
 
-     ClrBit(PADDR, 6);
-		 ClrBit(PADDR, 7);
-		 ClrBit(PAOR, 6);
-		 ClrBit(PAOR, 7);	//Floating Input
+
 		 
 		 SetBit (PBDDR, 6);
 		 SetBit (PBOR, 6);
 		 SetBit (PBDR, 6);
-		 
-		 for (i = 0; i < 255; i ++)
-		 {
-			 j++;
-			 j--;
-			 j++;
-			 j--;
-		 }
-		 for (i = 0; i < 255; i ++)
-		 {
-			 j++;
-			 j--;
-			 j++;
-			 j--;
-		 }		 
-		 ClrBit (PBDR, 6);                                  
-		 for (i = 0; i < 255; i ++)
-		 {
-			 j++;
-			 j--;
-			 j++;
-			 j--;
-		 }
-		 for (i = 0; i < 255; i ++)
-		 {
-			 j++;
-			 j--;
-			 j++;
-			 j--;
-		 }
-		 SetBit (PBDR, 6);
-}
-
-		
+	
+	
 		EnableInterrupts ;                   /* Global interrupt mask disabled */
 
-    SMBS_Init (SMBS_MISC,0x25,0x40);     /* Slave address configured as 16h */
+    SMBS_Init (0x25,0x40);     /* Slave address configured as 16h */
 		 
-		I2CCR |= ITE ;    
-					
 		while(1)
 		{
     Nop;

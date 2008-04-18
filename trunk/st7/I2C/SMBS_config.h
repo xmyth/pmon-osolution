@@ -45,14 +45,6 @@ typedef enum {
         }BOOL; 
 #endif	     
 
-/*---------------------Macros for Assembly instructions----------------------*/   
-#ifdef _MWERKS_
-#define EnableInterrupts {asm RIM;}
-#define DisableInterrupts {asm SIM;}
-#define Nop   {asm nop;}
-#define WaitforInterrupt {asm wfi;}
-#endif
-
 #ifdef _COSMIC_
 #define EnableInterrupts {_asm ("RIM");}  
 #define DisableInterrupts {_asm ("SIM");} 
