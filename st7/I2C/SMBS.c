@@ -1,61 +1,34 @@
-/******************************************************************************
-COPYRIGHT 2003 STMicroelectronics
-Source File Name : SMBS.c 
-Group            : IPSW,CMG-IPDF
-Author           : MCD Application Team
-Date First Issued: 18/07/2003   
--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-
-    THE SOFTWARE INCLUDED IN THIS FILE IS FOR GUIDANCE ONLY. STMicroelectronics 
-    SHALL NOT BE HELD LIABLE FOR ANY DIRECT, INDIRECT OR CONSEQUENTIAL 
-    DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM USE OF THIS SOFTWARE.
-
--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-********************************Documentation**********************************
-General Purpose - Contains source code for all the functions of Slave SMBus.
-********************************Revision History*******************************
-_______________________________________________________________________________
-Date :18/07/2003                  Release:1.0         	   	   	      	       		        
-******************************************************************************/
-
 #include "SMBS_config.h"                                /* Selection of Fcpu */
 #include "SMBS_hr.h"
 #include "ST7FLI49MK1T6.h"
-/*-----------------------------------------------------------------------------
-ROUTINE NAME : SMBS_Init
-INPUT        : Add_Param, Slave_Add
-OUTPUT       : None.
-DESCRIPTION  : Initialization of all I2C registers. Acknowledge and interrupt 
-               are enabled. Slave address of SMBus selected.
-COMMENTS     : Must be called before starting any SMBus operation
------------------------------------------------------------------------------*/
-void SMBS_Init (SMBS_Address_t Add_Param,unsigned char Slave_Add1,
-                unsigned char Slave_Add2)
-{
-     I2CCR &= (unsigned char)(~PE) ;                          /* PE disabled */
-     I2CDR = 0x00 ;
-     I2CCCR = 0x00 ;
-     I2COAR1 = 0x00 ;
-     I2COAR2 = 0x00 ;                       /* All I2C registers initialised */          
-     if (Add_Param == SMBS_MISC)
-     {
-          I2COAR1 = Slave_Add1 ;             /* Configures I2C slave address */
-          I2COAR2 = Slave_Add2 ;
-     } 
-                    
-     if ( Fcpu >= 6000000)                        /* Checking for Fcpu range */
-          I2COAR2 |= FRI ;                                   /* Sets FR0 bit */
-          
-     I2CCR = PE ;                                              /* PE enabled */
-     I2CCR = (PE | ACK) ;                             /* Acknowledge enabled */
 
+
+unsigned char EEPROM[100];
+int I2CAddress = -1;
+unsigned char I2COffset = -1;
+
+void SMBS_Init (unsigned char Slave_Add1, unsigned char Slave_Add2)
+{
+	I2CCR &= (unsigned char)(~PE) ;                          /* PE disabled */
+	I2CDR = 0x00 ;
+	I2CCCR = 0x00 ;
+	I2COAR1 = 0x00 ;
+	I2COAR2 = 0x00 ;                       /* All I2C registers initialised */          
+	I2COAR1 = Slave_Add1 ;             /* Configures I2C slave address */
+	I2COAR2 = Slave_Add2 ;
+	
+								
+	if ( Fcpu >= 6000000)                        /* Checking for Fcpu range */
+		I2COAR2 |= FRI0 ;                                   /* Sets FR0 bit */
+			
+	I2CCR = PE ;                                              /* PE enabled */
+	I2CCR = (PE | ACK) ;                             /* Acknowledge enabled */
+	I2CCR |= ITE ;   						//Enable Interrupt
 }
 
-unsigned char tab[3] = {1, 4, 5};
+unsigned char STATE = EVT_NONE;
 
-#define CR_INIT_VALUE     25             
-
-void RST(void)
+void ResetI2C(void)
 {
 	//rst     CLR     I2CCR                  ;Force reset status of control register
 	I2CCR = 0;
@@ -67,94 +40,98 @@ void RST(void)
 	I2CCR |= PE;
 	//LD      a,#CR_INIT_VALUE       ;Set initial control register value. 
 	//LD      I2CCR,A
-	I2CCR = CR_INIT_VALUE;
+	I2CCR = (PE | ACK);
 	//CLR	index
-	//index = 0;
+	I2CAddress = -1;
 	//IRET
-	return;		
+	STATE = EVT_NONE;
+	
+	I2CCR |= ITE ;   						//Enable Interrupt
+
+return;		
 }        
 
 
-void i2c_rt()
+//unsigned char statnum = 0;
+//unsigned char stat[50][2];
+
+@interrupt void I2C_INT(void)
 {         
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	unsigned char SMBS_SR1 = I2CSR1;
-  unsigned char SMBS_SR2 = I2CSR2;                                                                      
-  
-  //BCP     A,#%00010010           ;Acknowledge Failure or Bus Error?    	              
-  //JREQ    test_EV1               ;if not -> test_EV1.
-  
-  if ((SMBS_SR2 & 0x12) == 0)
+  unsigned char SMBS_SR2 = I2CSR2;    
+
+//  stat[statnum][0] = SMBS_SR1;
+//  stat[statnum++][1] = SMBS_SR2;
+                                                                  
+  if (SMBS_SR2 & BERR)	//Check if Bus Error
   {
-    //test_EV1 
-    //BTJF    I2CST1,#ADSL,test_EV2   ;own address is recognized   
-    if ((SMBS_SR1 & ADSL) == 0)
-      {
-      //test_EV2                                ;or EV3 
-      //        BTJF    I2CST1,#BTF,test_EV4    ;if BTF=0 -> test if a Stop is received.
-      if ((SMBS_SR1 & BTF) == 0)
-        {
-        //test_EV4	
-        //BTJF    I2CST2,#STOPF,rst       ;end of reception or transmission.
-        if ((SMBS_SR2 & STOPF) == 0)
-        {
-          RST();
-          return;		
-        }
-      
-        //CLR	index 	
-        //index = 0;
-        //.end_it IRET
-        return;
-      }
-      //BTJT    I2CST1,#TRA,EV3         ;if the slave in transmitter mode ->EV3
-      if (SMBS_SR1 & TRA)
-      {
-        //EV3     LD      X,index
-        //        LD      A,(tab,X)               ;the slave transmitter mode
-        //	LD      I2CDR,A                 ;transmission of values stored into tab.
-//        I2CDR = index;
-        //INC 	index                   
-//        index++;
-//				index = index % 3;
-        //end_ev3 IRET	        
-        return;
-      }
-      //EV2     LD      A,I2CDR		        ;if not, the slave is the receiver.   
-      //LD      X,index 
-      //LD      (tab,X),A               ;store the received value into tab.
-     // tab[index] = I2CDR;
-      //INC     index                 
-      //index++;
-      
-      //end_EV2 IRET
-      return;
-    }
-    //IRET 	        	
-    return;
-  }
-  //BCP	A,#%00000010           ;Checking for bus error
-  if (SMBS_SR2 & 0x20 == 1)
-  {
-    //JRNE	rst		       ;if BERR, jump to rst
-    RST();
-    return;
-  }
-  //LD	A,index 	       ;if AF and index=last byte -> EV3_1.
-  //CP	A,#3
-//  if (index == 3)
-  {
-    //JRPL	EV3_1
-    //EV3_1   LD	A,#$FF			;Non acknowledge (AF=1).
-    //LD	I2CDR,A			;Dummy write to see STOP condition
-    I2CDR = 0xff;
-    //IRET     		
-    return;
-  }
-  
-  RST();
-  //IRET
+		ResetI2C();
+		return;
+	}
+	
+	if (SMBS_SR2 & AF)
+	{
+		//EV3-1
+		STATE = EVT3_1;
+		I2CDR = 0xFF;
+		return;
+	}
+		
+	//EV1: EVF=1, ADSL=1, cleared by reading SR1 register.
+	//EV2: EVF=1, BTF=1, cleared by reading SR1 register followed by reading DR register.
+	//EV3: EVF=1, BTF=1, cleared by reading SR1 register followed by writing DR register.
+	//EV3-1: EVF=1, AF=1, BTF=1; AF is cleared by reading SR1 register. BTF is cleared by releasing the lines
+	//(STOP=1, STOP=0) or by writing DR register (DR=FFh). If lines are released by STOP=1, STOP=0, the On-chip peripherals subsequent EV4 is not seen.
+	//EV4: EVF=1, STOPF=1, cleared by reading SR2 register.
+	
+	if (SMBS_SR1 & EVF == 0)
+		return;
+
+	if (SMBS_SR1 & ADSL)
+	{
+		I2CAddress = I2CDR;
+		STATE = EVT1;
+		I2COffset = 0;
+		return;
+	}
+	if (SMBS_SR1 & BTF)
+	{
+		//Next, in 7-bit mode read the DR register to determine from the least significant bit (Data
+		//Direction Bit) if the slave must enter Receiver or Transmitter mode.
+		
+		if (I2CAddress & BIT0)
+		{
+			//EV3
+			STATE = EVT3;
+			
+			//Read OP
+			I2CDR = EEPROM[I2COffset];
+			I2COffset++;
+		}
+		else
+		{
+			//EV2
+			STATE = EVT2;
+
+			if (I2COffset == 0)
+				I2COffset = I2CDR;
+			else
+			{
+					//Write OP
+				EEPROM[I2COffset] = I2CDR;
+			}
+		}
+	}
+	else if (SMBS_SR2 & STOPF)
+	{
+		//EV4
+		STATE = EVT_NONE;
+	}
+	else
+	{
+		ResetI2C();
+	}
+
   return;                      
 }
-
-/*** (c) 2003  ST Microelectronics ****************** END OF FILE ************/

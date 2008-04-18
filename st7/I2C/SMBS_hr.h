@@ -30,32 +30,57 @@ Date :18/07/2003                  Release:1.0
 /* I2C Hardware Registers */ 
 #endif
 
+
+#define BIT0 1
+#define BIT1 2
+#define BIT2 4
+#define BIT3 8
+#define BIT4 0x10
+#define BIT5 0x20
+#define BIT6 0x40
+#define BIT7 0x80
+
+
+
 /*****************************************************************************/
 /***** H A R D W A R E   R E G I S T E R   B I T   D E F I N I T I O N S *****/
 /*****************************************************************************/
-#define ITE         0x01                           /* Interrupt enable flags */  
-#define STOP        0x02                   /* Stop condition indication flag */
-#define ACK         0x04                             /* I2C acknowledge flag */
-#define ENGC				0x08										/* Enable General Call bit */
-#define PE          0x20                           /* Peripheral enable flag */
+
+//CCR
+#define ITE         BIT0                           /* Interrupt enable flags */  
+#define STOP        BIT1                   /* Stop condition indication flag */
+#define ACK         BIT2                             /* I2C acknowledge flag */
+#define START				BIT3		
+#define ENGC				BIT4										/* Enable General Call bit */
+#define PE          BIT5                           /* Peripheral enable flag */
+
+//CSR1
+#define	SB					BIT0
+#define	MSMODE			BIT1
+#define ADSL        BIT2                 /* Address matched indication flage */
+#define BTF         BIT3                        /* Byte transfer status flag */
+#define BUSY				BIT4
+#define TRA         BIT5                           /* Interrupt enable flags */
+#define ADD10				BIT6
+#define	EVF					BIT7
+
+//CSR2
+#define GCAL				BIT0
+#define BERR        BIT1
+#define ARLO				BIT2 
+#define STOPF       BIT3
+#define AF          BIT4
 
 
-#define	MASTER			0x01
-#define	MSMODE			0x02
-#define ADSL        0x04                 /* Address matched indication flage */
-#define BTF         0x08                        /* Byte transfer status flag */
-#define BUSY				0x10
-#define TRA         0x20                           /* Interrupt enable flags */
-#define ADD10				0x40
-#define	EVF					0x80
+//OAR2
+#define FRI0        BIT6                               /* I2COAR2 FR[i] bits */
 
-#define ERR         0x16                                      /* Error flags */
-#define FRI         0x40                               /* I2COAR2 FR[i] bits */
-
-
-#define AF          0x10
-#define BERR        0x20
-#define STOPF       0x08
+#define EVT_NONE	  0
+#define EVT1				1
+#define EVT2				2
+#define EVT3				3
+#define EVT3_1			31
+#define EVT4				4
 
 #endif
 

@@ -51,57 +51,9 @@ typedef enum {
 /*---------------------------------------------------------------------------*/
                   /* Description of all the functions defined in this module */
 
-void SMBS_Init (SMBS_Address_t,unsigned char, unsigned char);  
+void SMBS_Init (unsigned char, unsigned char);  
                    /* Initialise I2C registers and selects the slave address */                                                 
-            
-SMBS_ErrCode_t SMBS_QuickCommand (void);                  
-       /* Receives slave address, Inside ISR user can write his own function */
-                                                                                              
-SMBS_ErrCode_t SMBS_SendByte (unsigned char *);       /* Transmits data byte */
-
-SMBS_ErrCode_t SMBS_ReceiveByte (unsigned char*);     /* Receives data bytes */
-                                                     
-SMBS_ErrCode_t SMBS_Rx_CmdCode (unsigned char*, unsigned char *) ; 
-                                    /* Receives slave address & command code */ 
-
-SMBS_ErrCode_t SMBS_WriteByte (unsigned char *);  
-                                    /* Sends data byte based on command code */
-
-SMBS_ErrCode_t SMBS_ReadByte (unsigned char*);      
-                                 /* Receives data byte based on command code */
-
-SMBS_ErrCode_t SMBS_WriteWord (unsigned char * );            /* Sends a word */
-
-SMBS_ErrCode_t SMBS_ReadWord (unsigned char *);           /* Receives a word */
-                                   
-SMBS_ErrCode_t SMBS_ProcessCall_Word (unsigned char*,unsigned char*);
-                                           /* Reads a word and writes a word */
-                                           
-SMBS_ErrCode_t SMBS_WriteBlock (unsigned char*,unsigned char);
-                                                    /* Sends a block of data */
-                                   
-SMBS_ErrCode_t SMBS_ReadBlock (unsigned char*);  /* Receives a block of data */
-                          
-SMBS_ErrCode_t SMBS_ProcessCall_Block (unsigned char*,unsigned char,
-                                      unsigned char*);
-                         /* Reads a Block of data and writes a block of data */
-
-void SMBS_Error_Clear (void);      /* Clear the error flags, if there is any */
-
-void SMBS_IT_Function (void) ;                  /* Interrupt service routine */
-
-static void SMBS_Tx (void) ;                    /* Data Transmission routine */
-
-static void SMBS_Rx (void) ;                       /* Data Reception routine */
-
-BOOL SMBS_ClkLow_Delay (void);          /* 25ms delay loop for byte transfer */
-
-void SMBS_QC_UsrRoutine(void) ;           /* User function for quick command */ 
-
-#ifdef SMBS_PEC
-static void SMBS_CRC8 (void) ;                        /* For calculating PEC */
-#endif
-
+ 
 #endif
 
 /**** (c) 2001   STMicroelectronics *************************** END OF FILE **/

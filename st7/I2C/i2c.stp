@@ -97,14 +97,16 @@ String.6.0=2008,4,13,23,23,31
 [Root.Config.0.Settings.5]
 String.2.0=Running Pre-Link step
 String.6.0=2008,4,13,23,23,31
+String.8.0=
 
 [Root.Config.0.Settings.6]
 String.2.0=Running Linker
-String.3.0=clnk -customMapFile -customMapFile-m $(OutputPath)$(TargetSName).map -fakeRunConv  -fakeInteger  -fakeAutoGen  $(ToolsetLibOpts)  -o $(OutputPath)$(TargetSName).st7 -fakeOutFile$(ProjectSFile).elf -customCfgFile $(OutputPath)$(TargetSName).lkf -fakeVectFileinterrupt_vector.c    -fakeStartupcrtsi.st7 
+String.3.0=clnk -customMapFile -customMapFile-m $(OutputPath)$(TargetSName).map -fakeRunConv -fakeInteger -fakeAutoGen $(ToolsetLibOpts) -o $(OutputPath)$(TargetSName).st7 -fakeOutFile$(ProjectSFile).elf -customCfgFile $(OutputPath)$(TargetSName).lkf -fakeVectFileinterrupt_vector.c -fakeStartupcrtsi.st7 
 String.3.1=cvdwarf $(OutputPath)$(TargetSName).st7 -fakeVectAddr0xffe0
 String.4.0=$(OutputPath)$(TargetFName)
 String.5.0=$(OutputPath)$(TargetSName).map $(OutputPath)$(TargetSName).st7 $(OutputPath)$(TargetSName).s19
 String.6.0=2008,4,13,23,23,31
+String.100.0=
 String.101.0=crtsi.st7
 String.102.0=+seg .text -b 0xf000 -m 0x1000  -n .text 
 String.102.1=+seg .const -a .text  -n .const 
@@ -233,10 +235,10 @@ Int.1=0
 
 [Root.Source Files.Config.0.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxst7 -customDbg -customDebCompat -no -customLst -l +modm -customC-pp $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile) 
+String.3.0=cxst7 $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) +modmm -customDebCompat -no -customC-pp -customLst -l $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2008,4,13,23,23,31
+String.6.0=2008,4,18,22,50,59
 
 [Root.Source Files.Config.0.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -292,30 +294,11 @@ Next=Root.Source Files.smbs.c
 [Root.Source Files.smbs.c]
 ElemType=File
 PathName=smbs.c
-Next=Root.Source Files.smbs.h
-
-[Root.Source Files.smbs.h]
-ElemType=File
-PathName=smbs.h
-Next=Root.Source Files.smbs_config.h
-
-[Root.Source Files.smbs_config.h]
-ElemType=File
-PathName=smbs_config.h
-Next=Root.Source Files.smbs_hr.c
-
-[Root.Source Files.smbs_hr.c]
-ElemType=File
-PathName=smbs_hr.c
-Next=Root.Source Files.smbs_hr.h
-
-[Root.Source Files.smbs_hr.h]
-ElemType=File
-PathName=smbs_hr.h
 
 [Root.Include Files]
 ElemType=Folder
 PathName=Include Files
+Child=Root.Include Files.smbs.h
 Config.0=Root.Include Files.Config.0
 Config.1=Root.Include Files.Config.1
 
@@ -384,3 +367,22 @@ String.3.0=
 String.4.0=
 String.5.0=
 String.6.0=2008,4,13,23,23,31
+
+[Root.Include Files.smbs.h]
+ElemType=File
+PathName=smbs.h
+Next=Root.Include Files.smbs_hr.h
+
+[Root.Include Files.smbs_hr.h]
+ElemType=File
+PathName=smbs_hr.h
+Next=Root.Include Files.smbs_config.h
+
+[Root.Include Files.smbs_config.h]
+ElemType=File
+PathName=smbs_config.h
+Next=Root.Include Files.st7fli49mk1t6.h
+
+[Root.Include Files.st7fli49mk1t6.h]
+ElemType=File
+PathName=st7fli49mk1t6.h
