@@ -36,6 +36,6 @@ void (* const _vectab[])() = {
 	NonHandledInterrupt,			/* 0xFFF6 */
 	NonHandledInterrupt,			/* 0xFFF8 */
 	NonHandledInterrupt,			/* 0xFFFA */
-	NonHandledInterrupt,			/* Trap vector */
+	PWR_PRESSED_INT,			/* Trap vector */
 	_stext,			/* Reset Vector */
 };

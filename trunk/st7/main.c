@@ -7,59 +7,20 @@
 #include "common.h"
 #include "eeprom.h"
 
-extern void eeprom_init(void);
-extern void eeprom_update_status(PM_STATUS);
-extern void sys_poweron(void);
-extern void sys_poweroff(void);
+
 extern void sys_init(void);
+extern void sys_power(PM_STATUS status);
 
-PM_STATUS eeprom_get_status();
-
-extern unsigned char g_pm_status_his;
 unsigned char lt2_rtc_count = 0;
 unsigned char t_sec = 0;
-unsigned char pwr_pressed = 0;
+unsigned char pwrbtn_pressed = 0;
+
+PM_STATUS g_traped = PM_STATUS_NULL;
 
 main()
 {
 	sys_init();
 	while (1);
-}
-
-/*
- * interrupt 
- */
- 
-@interrupt void LT2_RTC_INT(void) {
-	lt2_rtc_count++;
-	LTCSR1;
-	if (lt2_rtc_count ==255) {
-		t_sec ++;
-	}	
-}
-
-@interrupt void PWR_PRESSED_INT(void) {
-	//DisableInterrupts;
-	/*
-	if (pwr_pressed == 0) {
-		SetBit (EICR, 2);
-		ClrBit (EICR, 3);
-		t_sec = 0;
-		pwr_pressed = 1;
-	} else {
-		ClrBit (EICR, 2);
-		SetBit (EICR, 3);
-		pwr_pressed = 0;
-		
-		if (t_sec > 5) {
-			sys_poweroff();
-		} else {
-			sys_poweron();
-		}
-	}*/
-	
-	//sys_poweron();
-	//EnableInterrupts;	
 }
 
 void sys_init(void) {
@@ -83,54 +44,96 @@ void sys_init(void) {
 	SetBit (PBOR, 5);
 	
 	ClrBit (EICR, 2);
-	SetBit (EICR, 3);
+	SetBit (EICR, 3);	
 	
-	eeprom_init();
-	  
-	if (PM_STATUS_ABNORMAL == g_pm_status_his)
-	{
-		sys_poweron();
+	if (eeprom_init() == PM_STATUS_ABNORMAL) {
+		g_traped = PM_STATUS_POWERON;
 	} else {
-		sys_poweroff();
+		g_traped = PM_STATUS_POWEROFF;
 	}
-
 	EnableInterrupts;
-	
+	Trap;
 }
 
-void sys_poweron(void) {
-	unsigned char i, j, k;	
+/*
+ * interrupt 
+ */
+ 
+@interrupt void LT2_RTC_INT(void) {
+	lt2_rtc_count++;
+	LTCSR1;
+	if (lt2_rtc_count ==250) {
+		t_sec ++;
+		lt2_rtc_count = 0;
+	}	
+}
+
+@interrupt void PWR_PRESSED_INT(void) {
 	
-	for (i = 0; i < 255; i++)
-		for (j = 0; j < 255; j++)
+	PM_STATUS pm_status = PM_STATUS_NULL;
+	
+	if (g_traped != PM_STATUS_NULL) {
+		sys_power(g_traped);
+		g_traped = PM_STATUS_NULL;
+		return;
+	}
+	
+	if (pwrbtn_pressed == 0) {
+		SetBit (EICR, 2);
+		ClrBit (EICR, 3);
+		lt2_rtc_count = 0;
+		t_sec = 0;
+		pwrbtn_pressed = 1;
+	} else {
+		ClrBit (EICR, 2);
+		SetBit (EICR, 3);
+		pwrbtn_pressed = 0;
+		
+		if (t_sec >= 5 || (t_sec == 4  && lt2_rtc_count > 0)) {
+			pm_status = PM_STATUS_POWEROFF;
+		} else {
+			pm_status = PM_STATUS_POWERON;
+		}
+		
+		if (pm_status != PM_STATUS_NULL && pm_status != eeprom_get_status()) {
+			sys_power(pm_status);	
+		}		
+	}	
+}
+
+void sys_power(PM_STATUS pm_status) {
+	
+	if (pm_status == PM_STATUS_POWERON) {
+		
+		unsigned char i, j, k;	
+		
+		for (i = 0; i < 255; i++)
+			for (j = 0; j < 255; j++)
+						;
+	
+		ClrBit (PBDR, 6);
+	
+		for (i = 0; i < 255; i++)
+			for (j = 0; j < 255; j++)
 					;
-
-	ClrBit (PBDR, 6);
-
-	for (i = 0; i < 255; i++)
-		for (j = 0; j < 255; j++)
-				;
+		
+		SetBit (PBDR, 6);
 	
-	SetBit (PBDR, 6);
-
-	for (i = 0; i < 255; i++)
-		for (j = 0; j < 255; j++)
-				;
-
-	SetBit (PADR, 4);
-
-	SetBit (PADR, 5);
-
-	//eeprom_update_status(PM_STATUS_POWERON);
-
-}
-
-void sys_poweroff(void) {
+		for (i = 0; i < 255; i++)
+			for (j = 0; j < 255; j++)
+					;
 	
-	ClrBit (PADR, 4);
-	ClrBit (PADR, 5);
-	//eeprom_update_status(PM_STATUS_POWEROFF);
+		SetBit (PADR, 4);	
+		SetBit (PADR, 5);
+		
+	} else {
+		
+		ClrBit (PADR, 4);
+		ClrBit (PADR, 5);
+		
+	}
 	
+	eeprom_update_status(pm_status);
 }
 
 
