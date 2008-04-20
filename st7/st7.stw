@@ -6,3 +6,10 @@ Keyword=ST7Workspace-V0.7
 [Project0]
 Filename=st7.stp
 Dependencies=
+[Options]
+ActiveProject=st7
+ActiveConfig=Debug
+AddSortedElements=1
+[Batch Build]
+Debug=st7
+Release=st7
