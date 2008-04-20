@@ -153,7 +153,7 @@ PM_STATUS __eeprom_get_status(void) {
 	return (PM_STATUS) (E_PM_STATUS);
 }
 PM_STATUS __eeprom_get_cfg(void) {
-	return (PM_STATUS) (E_PM_STATUS);
+	return (PM_STATUS) (E_PM_BOOT_CFG);
 }
 
 PM_STATUS eeprom_get_status(void) {
