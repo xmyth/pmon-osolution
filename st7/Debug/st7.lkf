@@ -26,6 +26,7 @@ crtsx.st7
 
 # Put your object files here (they depend on you application)
 #<BEGIN OBJECT_FILES>
+Debug\smbs.o
 Debug\eeprom.o
 Debug\main.o
 #<END OBJECT_FILES>
