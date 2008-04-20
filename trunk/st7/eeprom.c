@@ -3,7 +3,6 @@
 #include "eeprom.h"
 
 static unsigned char crc8_calc(unsigned char val, unsigned char *ptr, int length);
-static unsigned char crc8_calc2(unsigned char val, unsigned char *ptr, int length);
 
 /*
  * crc8 table
@@ -57,7 +56,7 @@ PM_STATUS eeprom_init() {
 
 	if (       (eeprom_data[IDX_VENDOR_ID] != E_VENDOR_ID) 
 			|| (eeprom_data[IDX_LENGTH]    != E_LENGTH) 
-			|| (crc8_calc2(0, &E_EEPROM_START, E_LENGTH) != E_CHECK_SUM) 
+			|| (crc8_calc(0, &E_EEPROM_START, E_LENGTH) != E_CHECK_SUM) 
 			|| (PM_STATUS)(E_PM_STATUS) != PM_STATUS_POWEROFF) {
 				
 		return PM_STATUS_ABNORMAL;
@@ -127,15 +126,3 @@ unsigned char crc8_calc(unsigned char val, unsigned char *ptr, int length) {
 	return a;
 }
 
-unsigned char crc8_calc2(unsigned char val, unsigned char *ptr, int length) {
-
-	unsigned char a = val;
-	int i = length;
-
-	while (i > 0) {
-		a = crctab [ a ^ *ptr ];
-		ptr++;
-		i--;
-	}
-	return a;
-}
