@@ -82,7 +82,7 @@ void sys_init(void) {
 }
 
 @interrupt void TRAP_INT(void) {	
-	
+
 	if (g_traped_boot == 1) {
 		
 		PM_STATUS pm_status_boot = eeprom_init();		
@@ -90,7 +90,8 @@ void sys_init(void) {
 
 		g_traped_boot = 0;
 		return;
-	}
+	}	
+
 
 	if (g_traped_pm_status != PM_STATUS_NULL) {
 		sys_power(g_traped_pm_status);
@@ -122,13 +123,12 @@ void sys_init(void) {
 				g_traped_pm_status = PM_STATUS_POWERON;				
 			} else {
 				g_pwrbtn_long_pressed_poweroff = 0;
-			}
-		} else if (pm_status_cur == PM_STATUS_POWERON) {
-			g_traped_pm_status = PM_STATUS_POWEROFF;
-		} else if (pm_status_cur == PM_STATUS_RUNNING) {
-			notify_cpu_poweroff();
+			}		 
 		}
-		Trap;		
+		
+		if (g_traped_pm_status != PM_STATUS_NULL) {
+			Trap;		
+		}
 	}	
 }
 
