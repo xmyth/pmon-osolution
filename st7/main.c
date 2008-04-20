@@ -110,7 +110,9 @@ void sys_init(void) {
 void sys_power(PM_STATUS pm_status) {
 	
 	if (pm_status == PM_STATUS_NULL || pm_status == (PM_STATUS)E_PM_STATUS) {
-		return;
+		if (g_traped_boot == 0) {
+			return;
+		}
 	}
 	
 	if (pm_status == PM_STATUS_POWERON) {
