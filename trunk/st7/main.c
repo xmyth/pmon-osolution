@@ -45,8 +45,9 @@ void sys_init(void) {
 	SetBit (PBOR, 5);
 	
 	ClrBit (EICR, 2);
-	SetBit (EICR, 3);	
-	
+	SetBit (EICR, 3);
+
+	g_traped_boot = 1;
 	EnableInterrupts;
 	Trap;
 }
@@ -98,9 +99,9 @@ void sys_init(void) {
 		pwrbtn_pressed = 0;
 		
 		if (t_sec >= 5 || (t_sec == 4  && lt2_rtc_count > 0)) {
-			g_traped_pm_status = PM_STATUS_POWERON;
-		} else {
 			g_traped_pm_status = PM_STATUS_POWEROFF;
+		} else {
+			g_traped_pm_status = PM_STATUS_POWERON;
 		}
 		Trap;
 	}	
