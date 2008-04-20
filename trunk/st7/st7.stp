@@ -210,7 +210,7 @@ String.6.0=2008,4,17,20,17,16
 [Root.Source Files]
 ElemType=Folder
 PathName=Source Files
-Child=Root.Source Files.eeprom.c
+Child=Root.Source Files.smbs.c
 Next=Root.Include Files
 Config.0=Root.Source Files.Config.0
 Config.1=Root.Source Files.Config.1
@@ -280,6 +280,11 @@ String.3.0=
 String.4.0=
 String.5.0=
 String.6.0=2008,4,17,20,17,16
+
+[Root.Source Files.smbs.c]
+ElemType=File
+PathName=smbs.c
+Next=Root.Source Files.eeprom.c
 
 [Root.Source Files.eeprom.c]
 ElemType=File
@@ -406,7 +411,7 @@ String.8.0=Release
 [Root.Include Files]
 ElemType=Folder
 PathName=Include Files
-Child=Root.Include Files.common.h
+Child=Root.Include Files.smbs.h
 Config.0=Root.Include Files.Config.0
 Config.1=Root.Include Files.Config.1
 
@@ -475,6 +480,11 @@ String.3.0=
 String.4.0=
 String.5.0=
 String.6.0=2008,4,17,20,17,16
+
+[Root.Include Files.smbs.h]
+ElemType=File
+PathName=smbs.h
+Next=Root.Include Files.common.h
 
 [Root.Include Files.common.h]
 ElemType=File
