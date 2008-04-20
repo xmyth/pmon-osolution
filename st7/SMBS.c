@@ -58,7 +58,7 @@ return;
 
 
 //unsigned char statnum = 0;
-//unsigned char stat[50][2];
+//unsigned char eeprom[30];
 
 @interrupt void I2C_INT(void)
 {         
@@ -96,7 +96,6 @@ return;
 	if (SMBS_SR1 & ADSL)
 	{
 		I2CAddress = I2CDR;
-		I2COffset = INVALID_ADDR;
 		STATE = EVT1;
 		return;
 	}
@@ -112,7 +111,19 @@ return;
 			
 			//Read OP
 			//I2CDR = EEPROM[I2COffset];
-      I2CDR=eeprom_get_status();
+      //I2CDR=eeprom[I2COffset];
+			if (I2COffset == 0)
+			{
+				I2CDR = eeprom_get_status(); 
+			}
+			else if (I2COffset == 1)
+			{
+				I2CDR = eeprom_get_cfg();
+			}
+			else
+			{
+				I2CDR = 0xaa;
+			}
 			I2COffset++;
 		}
 		else
@@ -128,6 +139,8 @@ return;
 				//EEPROM[I2COffset] = I2CDR;
         g_traped_pm_status = (PM_STATUS)I2CDR;
         Trap;
+				//eeprom[I2COffset] = I2CDR;
+				//I2COffset++;
 			}
 		}
 	}
@@ -135,6 +148,7 @@ return;
 	{
 		//EV4
 		STATE = EVT_NONE;
+		I2COffset = INVALID_ADDR;
 	}
 	else
 	{
