@@ -81,14 +81,12 @@ void sys_init(void) {
 	}	
 }
 
-@interrupt void TRAP_INT(void) {
+@interrupt void TRAP_INT(void) {	
 	
 	if (g_traped_boot == 1) {
-		if (eeprom_init() == PM_STATUS_ABNORMAL) {
-			sys_power(PM_STATUS_POWERON);
-		} else {
-			sys_power(PM_STATUS_POWEROFF);
-		}
+		
+		PM_STATUS pm_status_boot = eeprom_init();		
+		sys_power(pm_status_boot);
 
 		g_traped_boot = 0;
 		return;
@@ -130,49 +128,48 @@ void sys_init(void) {
 		} else if (pm_status_cur == PM_STATUS_RUNNING) {
 			notify_cpu_poweroff();
 		}
-		if (g_traped_pm_status != PM_STATUS_NULL) {
-			Trap;
-		}
+		Trap;		
 	}	
 }
 
 void sys_power(PM_STATUS pm_status) {
 	
-	if (pm_status == PM_STATUS_NULL || pm_status == (PM_STATUS)E_PM_STATUS) {
+	if (pm_status == eeprom_get_status() || pm_status == eeprom_get_cfg()) {
 		if (g_traped_boot == 0) {
 			return;
 		}
-	}
-	
-	if (pm_status == PM_STATUS_POWERON) {
+	}	
+	switch (pm_status) {
+		case PM_STATUS_POWERON:
+		{			
+			unsigned char i, j, k;				
+			for (i = 0; i < 255; i++)
+				for (j = 0; j < 255; j++)
+							;		
+			
+			ClrBit (PBDR, 6);		
+			for (i = 0; i < 255; i++)
+				for (j = 0; j < 255; j++)
+						;			
 		
-		unsigned char i, j, k;	
-		
-		for (i = 0; i < 255; i++)
-			for (j = 0; j < 255; j++)
+			SetBit (PBDR, 6);
+			for (i = 0; i < 255; i++)
+				for (j = 0; j < 255; j++)
 						;
-	
-		ClrBit (PBDR, 6);
-	
-		for (i = 0; i < 255; i++)
-			for (j = 0; j < 255; j++)
-					;
 		
-		SetBit (PBDR, 6);
-	
-		for (i = 0; i < 255; i++)
-			for (j = 0; j < 255; j++)
-					;
-	
-		SetBit (PADR, 4);	
-		SetBit (PADR, 5);
-		
-	} else if (pm_status == PM_STATUS_POWEROFF) {
-		
-		ClrBit (PADR, 4);
-		ClrBit (PADR, 5);		
-	}
-	
+			SetBit (PADR, 4);	
+			SetBit (PADR, 5);			
+		}; break;
+		case PM_STATUS_POWEROFF:
+		case PM_STATUS_STR:
+		case PM_STATUS_STD:		
+		{		
+			ClrBit (PADR, 4);
+			ClrBit (PADR, 5);		
+		}; break;
+		default:
+			break;
+	}			
 	eeprom_update_status(pm_status);
 }
 

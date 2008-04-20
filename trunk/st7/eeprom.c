@@ -3,7 +3,8 @@
 #include "eeprom.h"
 
 static unsigned char crc8_calc(unsigned char val, unsigned char *ptr, int length);
-
+static PM_STATUS __eeprom_get_status(void);
+static PM_STATUS __eeprom_get_cfg(void);
 /*
  * crc8 table
  */
@@ -30,42 +31,73 @@ static const unsigned char crctab[] =
 
 #define D_SECTOR_SIZE 32
 
-#define IDX_VENDOR_ID 0
-#define IDX_VERSION   1
-#define IDX_LENGTH    2
-#define IDX_PM_STATUS 3
-#define IDX_CHECKSUM  4
+#define IDX_VENDOR_ID     0
+#define IDX_VERSION       1
+#define IDX_LENGTH        2
+#define IDX_PM_STATUS     3
+#define IDX_PM_BOOT_CFG   4
+#define IDX_CHECKSUM      5
 
 
 static unsigned char eeprom_data[] = 
 {
 	0x03, // VENDOR_ID
 	0x01, // VERSION
-	0x04, // LENGTH
+	0x05, // LENGTH
 	0x00, // PM_STATUS
+	0x07, // PM_BOOT_CFG
 	0x00  // CHECK_SUM
 };
 
 unsigned char g_pm_status_his = PM_STATUS_ABNORMAL;
 
 PM_STATUS eeprom_init() {
-	
+
+	PM_STATUS pm_status = PM_STATUS_NULL;
 	/*
 	 *  verify failed
 	 */
 
-	if (       (eeprom_data[IDX_VENDOR_ID] != E_VENDOR_ID) 
+	if (   (eeprom_data[IDX_VENDOR_ID] != E_VENDOR_ID) 
 			|| (eeprom_data[IDX_LENGTH]    != E_LENGTH) 
-			|| (crc8_calc(0, &E_EEPROM_START, E_LENGTH) != E_CHECK_SUM) 
-			|| (PM_STATUS)(E_PM_STATUS) != PM_STATUS_POWEROFF) {
+			|| (crc8_calc(0, &E_EEPROM_START, E_LENGTH) != E_CHECK_SUM)) {
 				
-		return PM_STATUS_ABNORMAL;
-
+		pm_status = PM_STATUS_POWERON;
+		eeprom_data[IDX_PM_BOOT_CFG] = PM_STATUS_AUTO;		
 	} else {
 		
-		return E_PM_STATUS;
+		PM_STATUS pm_cfg = __eeprom_get_cfg();
+		PM_STATUS pm_status_his = __eeprom_get_status();
+	
+		if (pm_cfg == PM_STATUS_POWERON_FORCED) {
+			
+			pm_status = PM_STATUS_POWERON;		
+		} else if (pm_cfg == PM_STATUS_POWEROFF_PORCED) {
+			
+			pm_status = PM_STATUS_POWEROFF;		
+		} else {
 		
-	}
+			if (pm_status_his == PM_STATUS_POWEROFF) {
+				
+				pm_status = PM_STATUS_POWEROFF;			
+			} else if (pm_status_his == PM_STATUS_POWERON) {
+				
+				pm_status = PM_STATUS_POWERON;		
+			} else if (pm_status_his == PM_STATUS_STR) {
+				
+				pm_status = PM_STATUS_STR;
+			} else if (pm_status_his == PM_STATUS_STD) {
+				
+				pm_status = PM_STATUS_STD;		
+			}
+			if (pm_cfg != PM_STATUS_AUTO) {
+				pm_cfg = PM_STATUS_AUTO;
+			}
+		}
+		eeprom_data[IDX_PM_BOOT_CFG] = pm_cfg;
+	}	
+	
+	return pm_status;
 }
 
 int eeprom_write(unsigned char offset, unsigned char *buf, unsigned char length) {
@@ -100,17 +132,36 @@ int eeprom_write(unsigned char offset, unsigned char *buf, unsigned char length)
 }
 
 void eeprom_update_status(PM_STATUS pm_status) {
-
-	eeprom_data[IDX_PM_STATUS] = pm_status;
-
-	eeprom_data[IDX_CHECKSUM] = crc8_calc(0, eeprom_data, sizeof(eeprom_data) - 1);
-
-	eeprom_write(0, eeprom_data, sizeof(eeprom_data));
 	
+	if (pm_status == PM_STATUS_AUTO
+		|| pm_status == PM_STATUS_POWERON_FORCED
+		|| pm_status == PM_STATUS_POWEROFF_PORCED) {
+			
+			eeprom_data[IDX_PM_BOOT_CFG] = pm_status;
+	} else if (pm_status == PM_STATUS_POWERON
+		|| pm_status == PM_STATUS_POWEROFF
+		|| pm_status == PM_STATUS_STR
+		|| pm_status == PM_STATUS_STD) {	
+		
+		eeprom_data[IDX_PM_STATUS] = pm_status;
+	}
+	eeprom_data[IDX_CHECKSUM] = crc8_calc(0, eeprom_data, sizeof(eeprom_data) - 1);
+	eeprom_write(0, eeprom_data, sizeof(eeprom_data));
+}
+
+PM_STATUS __eeprom_get_status(void) {
+	return (PM_STATUS) (E_PM_STATUS);
+}
+PM_STATUS __eeprom_get_cfg(void) {
+	return (PM_STATUS) (E_PM_STATUS);
 }
 
 PM_STATUS eeprom_get_status(void) {
 	return (PM_STATUS) eeprom_data[IDX_PM_STATUS];
+}
+
+PM_STATUS eeprom_get_cfg(void) {
+	return (PM_STATUS) eeprom_data[IDX_PM_BOOT_CFG];
 }
 
 unsigned char crc8_calc(unsigned char val, unsigned char *ptr, int length) {
