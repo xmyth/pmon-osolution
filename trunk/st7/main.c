@@ -8,12 +8,14 @@
 #include "eeprom.h"
 #include "smbs.h"
 
-extern void sys_init(void);
-extern void sys_power(PM_STATUS status);
+void sys_init(void);
+void sys_power(PM_STATUS status);
+void notify_cpu_poweroff(void);
 
 unsigned char lt2_rtc_count = 0;
 unsigned char t_sec = 0;
 unsigned char pwrbtn_pressed = 0;
+unsigned char g_pwrbtn_long_pressed_poweroff = 0;
 
 PM_STATUS g_traped_pm_status = PM_STATUS_NULL;
 int g_traped_boot = 0;
@@ -67,9 +69,15 @@ void sys_init(void) {
 @interrupt void LT2_RTC_INT(void) {
 	lt2_rtc_count++;
 	LTCSR1;
-	if (lt2_rtc_count ==250) {
+	if (pwrbtn_pressed == 1 && lt2_rtc_count ==250) {
 		t_sec ++;
 		lt2_rtc_count = 0;
+		
+		if (t_sec == 4 && eeprom_get_status() != PM_STATUS_POWEROFF) {
+			g_pwrbtn_long_pressed_poweroff = 1;
+			g_traped_pm_status = PM_STATUS_POWEROFF;
+			Trap;
+		}
 	}	
 }
 
@@ -95,6 +103,8 @@ void sys_init(void) {
 
 @interrupt void PWR_PRESSED_INT(void) {
 	
+	PM_STATUS pm_status_cur;
+	
 	if (pwrbtn_pressed == 0) {
 		SetBit (EICR, 2);
 		ClrBit (EICR, 3);
@@ -105,13 +115,23 @@ void sys_init(void) {
 		ClrBit (EICR, 2);
 		SetBit (EICR, 3);
 		pwrbtn_pressed = 0;
+		t_sec = 0;		
+		pm_status_cur = eeprom_get_status();
 		
-		if (t_sec >= 5 || (t_sec == 4  && lt2_rtc_count > 0)) {
+		if (pm_status_cur == PM_STATUS_POWEROFF) {
+			if (g_pwrbtn_long_pressed_poweroff != 1) {
+				g_traped_pm_status = PM_STATUS_POWERON;				
+			} else {
+				g_pwrbtn_long_pressed_poweroff = 0;
+			}
+		} else if (pm_status_cur == PM_STATUS_POWERON) {
 			g_traped_pm_status = PM_STATUS_POWEROFF;
-		} else {
-			g_traped_pm_status = PM_STATUS_POWERON;
+		} else if (pm_status_cur == PM_STATUS_RUNNING) {
+			notify_cpu_poweroff();
 		}
-		Trap;
+		if (g_traped_pm_status != PM_STATUS_NULL) {
+			Trap;
+		}
 	}	
 }
 
@@ -155,4 +175,6 @@ void sys_power(PM_STATUS pm_status) {
 	eeprom_update_status(pm_status);
 }
 
+void notify_cpu_poweroff(void) {
+}
 
