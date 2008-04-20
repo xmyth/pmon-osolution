@@ -9,6 +9,8 @@ extern void LT2_RTC_INT(void);
 
 extern void PWR_PRESSED_INT(void);
 
+extern void TRAP_INT(void);
+
 
 @interrupt void NonHandledInterrupt (void)
 {
@@ -36,6 +38,6 @@ void (* const _vectab[])() = {
 	NonHandledInterrupt,			/* 0xFFF6 */
 	NonHandledInterrupt,			/* 0xFFF8 */
 	NonHandledInterrupt,			/* 0xFFFA */
-	PWR_PRESSED_INT,			/* Trap vector */
+	TRAP_INT,			/* Trap vector */
 	_stext,			/* Reset Vector */
 };

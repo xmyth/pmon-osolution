@@ -15,7 +15,8 @@ unsigned char lt2_rtc_count = 0;
 unsigned char t_sec = 0;
 unsigned char pwrbtn_pressed = 0;
 
-PM_STATUS g_traped = PM_STATUS_NULL;
+PM_STATUS g_traped_pm_status = PM_STATUS_NULL;
+int g_traped_boot = 0;
 
 main()
 {
@@ -46,11 +47,6 @@ void sys_init(void) {
 	ClrBit (EICR, 2);
 	SetBit (EICR, 3);	
 	
-	if (eeprom_init() == PM_STATUS_ABNORMAL) {
-		g_traped = PM_STATUS_POWERON;
-	} else {
-		g_traped = PM_STATUS_POWEROFF;
-	}
 	EnableInterrupts;
 	Trap;
 }
@@ -68,15 +64,27 @@ void sys_init(void) {
 	}	
 }
 
-@interrupt void PWR_PRESSED_INT(void) {
+@interrupt void TRAP_INT(void) {
 	
-	PM_STATUS pm_status = PM_STATUS_NULL;
-	
-	if (g_traped != PM_STATUS_NULL) {
-		sys_power(g_traped);
-		g_traped = PM_STATUS_NULL;
+	if (g_traped_boot == 1) {
+		if (eeprom_init() == PM_STATUS_ABNORMAL) {
+			sys_power(PM_STATUS_POWERON);
+		} else {
+			sys_power(PM_STATUS_POWEROFF);
+		}
+
+		g_traped_boot = 0;
 		return;
 	}
+
+	if (g_traped_pm_status != PM_STATUS_NULL) {
+		sys_power(g_traped_pm_status);
+		g_traped_pm_status = PM_STATUS_NULL;
+		return;
+	}
+}
+
+@interrupt void PWR_PRESSED_INT(void) {
 	
 	if (pwrbtn_pressed == 0) {
 		SetBit (EICR, 2);
@@ -90,18 +98,19 @@ void sys_init(void) {
 		pwrbtn_pressed = 0;
 		
 		if (t_sec >= 5 || (t_sec == 4  && lt2_rtc_count > 0)) {
-			pm_status = PM_STATUS_POWEROFF;
+			g_traped_pm_status = PM_STATUS_POWERON;
 		} else {
-			pm_status = PM_STATUS_POWERON;
+			g_traped_pm_status = PM_STATUS_POWEROFF;
 		}
-		
-		if (pm_status != PM_STATUS_NULL && pm_status != eeprom_get_status()) {
-			sys_power(pm_status);	
-		}		
+		Trap;
 	}	
 }
 
 void sys_power(PM_STATUS pm_status) {
+	
+	if (pm_status == PM_STATUS_NULL || pm_status == (PM_STATUS)E_PM_STATUS) {
+		return;
+	}
 	
 	if (pm_status == PM_STATUS_POWERON) {
 		
@@ -126,11 +135,10 @@ void sys_power(PM_STATUS pm_status) {
 		SetBit (PADR, 4);	
 		SetBit (PADR, 5);
 		
-	} else {
+	} else if (pm_status == PM_STATUS_POWEROFF) {
 		
 		ClrBit (PADR, 4);
-		ClrBit (PADR, 5);
-		
+		ClrBit (PADR, 5);		
 	}
 	
 	eeprom_update_status(pm_status);
