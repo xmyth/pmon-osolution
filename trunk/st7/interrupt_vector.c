@@ -11,6 +11,7 @@ extern void PWR_PRESSED_INT(void);
 
 extern void TRAP_INT(void);
 
+extern void I2C_INT(void);
 
 @interrupt void NonHandledInterrupt (void)
 {
@@ -28,7 +29,7 @@ void (* const _vectab[])() = {
 	NonHandledInterrupt,			/* 0xFFE2 */
 	NonHandledInterrupt,			/* 0xFFE4 */
 	LT2_RTC_INT,							/* 0xFFE6 */
-	NonHandledInterrupt,			/* 0xFFE8 */
+	I2C_INT,            			/* 0xFFE8 */
 	NonHandledInterrupt,			/* 0xFFEA */
 	NonHandledInterrupt,			/* 0xFFEC */
 	NonHandledInterrupt,			/* 0xFFEE */

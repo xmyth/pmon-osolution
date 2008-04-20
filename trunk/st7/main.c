@@ -6,7 +6,7 @@
 #include "ST7FLI49MK1T6.h"
 #include "common.h"
 #include "eeprom.h"
-
+#include "smbs.h"
 
 extern void sys_init(void);
 extern void sys_power(PM_STATUS status);
@@ -28,7 +28,15 @@ void sys_init(void) {
 
 	DisableInterrupts;
 	LTCSR1 = 0x30;
+
+  //I2C SDA CLK Setting Floating Inpu
+  ClrBit(PADDR, 6);
+  ClrBit(PADDR, 7);
+  ClrBit(PAOR, 6);
+  ClrBit(PAOR, 7);		
 	
+  SMBS_Init (0x25,0x40);     /* Slave address configured*/
+
 	SetBit (PADDR, 4);
 	SetBit (PAOR, 4);
 	ClrBit (PADR, 4);
