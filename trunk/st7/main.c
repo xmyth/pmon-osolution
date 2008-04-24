@@ -124,8 +124,11 @@ void sys_init(void) {
 			} else {
 				g_pwrbtn_long_pressed_poweroff = 0;
 			}		 
-		}
-		
+		} else if (pm_status_cur == PM_STATUS_STR) {
+			g_traped_pm_status = PM_STATUS_STR_RESUME;
+		} else if (pm_status_cur == PM_STATUS_STD) {
+			g_traped_pm_status = PM_STATUS_POWERON;
+		}		
 		if (g_traped_pm_status != PM_STATUS_NULL) {
 			Trap;		
 		}
@@ -160,13 +163,23 @@ void sys_power(PM_STATUS pm_status) {
 			SetBit (PADR, 4);	
 			SetBit (PADR, 5);			
 		}; break;
-		case PM_STATUS_POWEROFF:
-		case PM_STATUS_STR:
+		case PM_STATUS_POWEROFF:		
 		case PM_STATUS_STD:		
 		{		
 			ClrBit (PADR, 4);
 			ClrBit (PADR, 5);		
 		}; break;
+		case PM_STATUS_STR:
+		{
+			SetBit (PADR, 4);
+			ClrBit (PADR, 5);
+		}; break;
+		case PM_STATUS_STR_RESUME:
+		{
+			SetBit (PADR, 4);
+			SetBit (PADR, 5);
+		}; break;
+		
 		default:
 			break;
 	}			
