@@ -132,7 +132,7 @@ int eeprom_write(unsigned char offset, unsigned char *buf, unsigned char length)
 }
 
 void eeprom_update_status(PM_STATUS pm_status) {
-	
+		
 	if (pm_status == PM_STATUS_AUTO
 		|| pm_status == PM_STATUS_POWERON_FORCED
 		|| pm_status == PM_STATUS_POWEROFF_PORCED) {
@@ -144,7 +144,10 @@ void eeprom_update_status(PM_STATUS pm_status) {
 		|| pm_status == PM_STATUS_STD) {	
 		
 		eeprom_data[IDX_PM_STATUS] = pm_status;
-	}
+	} else if (pm_status == PM_STATUS_STR_RESUME) {
+		
+		eeprom_data[IDX_PM_STATUS] = PM_STATUS_POWERON;
+	} 
 	eeprom_data[IDX_CHECKSUM] = crc8_calc(0, eeprom_data, sizeof(eeprom_data) - 1);
 	eeprom_write(0, eeprom_data, sizeof(eeprom_data));
 }
