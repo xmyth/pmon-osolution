@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include "via686b.h"
 #ifdef _KERNEL
 #undef _KERNEL
 #include <sys/ioctl.h>
@@ -1426,6 +1427,146 @@ static int mycmp(int argc,char **argv)
 	return 0;
 }
 
+
+static int myi2cwrite(int argc,char **argv)
+{
+	unsigned char s1,s2,s3;
+	int length,left;
+	unsigned int v0, a0;
+	if(argc!=4)return -1;
+	s1=strtoul(argv[1],0,0);	//chipId
+	s2=strtoul(argv[2],0,0);	//Offset
+	s3=strtoul(argv[3],0,0);	//Value
+
+	//Power off value is 1
+
+#ifdef CONFIG_32BIT
+	#define AddrBase 0xbfd00000
+#else
+	#define AddrBase 0xffffffffbfd00000
+#endif
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_DATA0) = s3;
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_DATA1) = 0;
+	
+	//ST7 chip addr 
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_ADDRESS) = s1;
+	
+	//Offset 
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_COMMAND) = s2;
+
+	//Byte Write
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_CONTROL) = 0x08;
+
+	v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	v0 &= 0x1f;
+	if (v0)
+	{
+		*(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS) = v0;
+		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	}
+	
+	//Start
+	v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_CONTROL);
+	v0 |= 0x40;
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_CONTROL) = v0;
+
+	do
+	{
+		//Wait
+		for (a0 = 0x1000; a0 != 0;);
+			a0--;
+		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	}while(v0 & SMBUS_HOST_STATUS_BUSY);
+
+	v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	v0 &= 0x1f;
+	if (v0)
+	{
+		*(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS) = v0;
+		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	}
+
+	if (s1 == 0x24 && s2 == 1 && s3 == 4)
+	{
+		unsigned long long state;
+		printf("Enter STR! \n");
+		*(volatile unsigned long long *)(0xaffffe80) = 0; //Shutdown ODT
+
+		state = *(volatile unsigned long long *)(0xaffffe30);
+		state |= 1<<32;
+		*(volatile unsigned long long *)(0xaffffe30) = state;
+	}
+
+	return 0;
+}
+
+
+
+
+static int myi2cread(int argc,char **argv)
+{
+
+	unsigned char s1,s2,s3;
+	int length,left;
+	unsigned int v0, a0;
+	if(argc!=3)return -1;
+	s1=strtoul(argv[1],0,0);	//chipId
+	s2=strtoul(argv[2],0,0);	//Offset
+	
+	//Power off value is 1
+
+#ifdef CONFIG_32BIT
+	#define AddrBase 0xbfd00000
+#else
+	#define AddrBase 0xffffffffbfd00000
+#endif
+	//*(volatile unsigned char *)(AddrBase + SMBUS_HOST_DATA0) = s3;
+	//*(volatile unsigned char *)(AddrBase + SMBUS_HOST_DATA1) = 0;
+	
+	//ST7 chip addr 
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_ADDRESS) = s1|1;
+	
+	//Offset 
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_COMMAND) = s2;
+
+	//Byte Write
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_CONTROL) = 0x08;
+
+	v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	v0 &= 0x1f;
+	if (v0)
+	{
+		*(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS) = v0;
+		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	}
+	
+	//Start
+	v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_CONTROL);
+	v0 |= 0x40;
+	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_CONTROL) = v0;
+
+	do
+	{
+		//Wait
+		for (a0 = 0x1000; a0 != 0;)
+			a0--;
+		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	}while(v0 & SMBUS_HOST_STATUS_BUSY);
+
+	v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	v0 &= 0x1f;
+	if (v0)
+	{
+		*(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS) = v0;
+		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+	}
+
+	s3 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_DATA0);
+
+	printf("value : %d \n", s3);
+
+	return 0;
+}
 //----------------------------------
 static const Cmd Cmds[] =
 {
@@ -1479,6 +1620,8 @@ static const Cmd Cmds[] =
 	{"linit","",0,"linit",linit,1,1,CMD_REPEAT},
 	{"mytest","",0,"mytest",mytest,1,1,CMD_REPEAT},
 	{"mycmp","s1 s2 len",0,"mecmp s1 s2 len",mycmp,4,4,CMD_REPEAT},
+	{"i2cwrite","chipId offset value",0,"i2cwrite chipId offset value",myi2cwrite,2,99,CMD_REPEAT},
+	{"i2cread","chidId offset",0,"i2cread chipId offset",myi2cread,2,99,CMD_REPEAT},
 	{0, 0}
 };
 
