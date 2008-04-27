@@ -709,7 +709,7 @@ reginit:			/* local name */
 	 */
 
 	PRINTSTR("[Test i2c.S start]\r\n")
-//#if 0
+
 #include "i2c.S"
 	beqz msize,.nodimm
 	nop
@@ -729,10 +729,8 @@ reginit:			/* local name */
 	bal	hexserial
 	nop
 	PRINTSTR("\r\n")
-##############################################
-//#endif
-gs_2f_v3_ddr2_cfg:
 
+##############################################
     ###enable the reg space###
 #if 1
 	TTYDBG	("\r\nenable register space of MEMORY\r\n")
@@ -767,7 +765,7 @@ not_locked:
 #endif
         
     ###disable the reg space###
-#if 1
+#if 0
 	TTYDBG	("\r\ndisable register space of MEMORY\r\n")
         li  t2,0xbfe00180
         ld  a1,0x0(t2)
@@ -1656,19 +1654,40 @@ ddr2_config:
     li      t1, 0x1d
     li      t2, CONFIG_BASE
 
-reg_write:
+	move t3,	ra
 #if 0
-	move	a0,t0
-	bal	hexserial
-        nop
+	PRINTSTR("\nDump Memory Controller Register!\r\n")
+	PRINTSTR("Start Address:")
 	move	a0,t2
 	bal	hexserial
-        nop
+	nop
+	PRINTSTR("\r\n")
 
-	move	a0,t1
+11:	move	a0, t2
+      bal	hexserial
+	nop
+	PRINTSTR(" = ")
+	ld 	a0, 0(t2)
+    	dsrl    a0, 32
+    	bal		hexserial
+      nop
+	ld 	a0, 0(t2)
 	bal	hexserial
-        nop
+	nop
+	PRINTSTR("\r\n")
+	addiu	t2, t2, 0x10
+	subu		t1, t1, 0x1
+	bne t1, $0, 11b
+	nop
 #endif
+
+    la      t0, ddr2_reg_data
+    addu    t0, t0, s0
+    li      t1, 0x1d
+    li      t2, CONFIG_BASE
+
+
+reg_write:
     ld      a1, 0x0(t0)
 #if 0
 	move	a0,a1
@@ -1680,7 +1699,7 @@ reg_write:
     addiu     t0, t0, 0x8
     bne     t1, $0, reg_write
     addiu     t2, t2, 0x10
-    
+
 	//Modify the CS parameter
     li      t2, CONFIG_BASE
     la 		t0, DDR2_CTL_07_DATA_LO
@@ -1699,7 +1718,8 @@ reg_write:
     bal		hexserial
     nop
     move	ra, t7
-
+    PRINTSTR("\r\n");
+    
 	//Modify the ROW & COL parameter
     li      t2, CONFIG_BASE
     la 		t0, DDR2_CTL_05_DATA_LO
@@ -1728,7 +1748,7 @@ reg_write:
     nop
     move	ra, t7
 
-
+    PRINTSTR("\r\n");
 	//Modify the Number of Bank
     li      t2, CONFIG_BASE
     la 		t0, DDR2_CTL_01_DATA_LO
@@ -1749,15 +1769,87 @@ reg_write:
     nop
     move	ra, t7
 
+    PRINTSTR("\r\n");
 
+	//Modify the SelfRefresh Mode
+    li      t2, CONFIG_BASE
+    ld		a1, 0x30(t2)  
+    move	a0, sdCfg
+    and	a0, 0x80000000
+
+    or	a1, a1, 0x10000000000
+
+    bnez  a0, 1f
+    nop
+    bal	2f
+    nop
+    
+1: //or		a1, 1
+    or		a1, 1<<32    
+2:    
+    sd		a1, 0x30(t2)
+    move 	a0, a1
+    move	t7, ra
+    bal		hexserial
+    nop
+    move	ra, t7
+
+/*
 	//Initialize
     li      t2, CONFIG_BASE
-    la		t0,DDR2_CTL_start_DATA_LO
-    #la		t0,ddr2_start_reg
-    addu    	t0, t0, s0
-    ld      a1, 0x0(t0)
+    ld		a1, 0x30(t2)  
+    or	a1, a1, 0x10000000000
     sd      a1, 0x30(t2)
+*/
 
+
+	//Exit the SelfRefresh Mode
+    li      t2, CONFIG_BASE
+    ld		a1, 0x30(t2)  
+    move	a0, sdCfg
+    and	a0, 0x80000000
+
+    bnez  a0, 1f
+    nop
+    bal	2f
+    nop
+    
+1: and		a1, 0xfffffffefffffffe
+    sd		a1, 0x30(t2)
+
+2:
+#if 1
+    la      t0, ddr2_reg_data
+    addu    t0, t0, s0
+    li      t1, 0x1d
+    li      t2, CONFIG_BASE
+
+	PRINTSTR("\r\nDump Memory Controller Register After Initialized!\r\n")
+	PRINTSTR("Start Address:")
+	move	a0,t2
+	bal	hexserial
+	nop
+	PRINTSTR("\r\n")
+
+11:	move	a0, t2
+	bal	hexserial
+	nop
+	PRINTSTR(" = ")
+	ld 	a0, 0(t2)
+    	dsrl    a0, 32
+    	bal		hexserial
+      nop
+	ld 	a0, 0(t2)
+	bal	hexserial
+	nop
+	PRINTSTR("\r\n")
+	addiu	t2, t2, 0x10
+	subu		t1, t1, 0x1
+	bne t1, $0, 11b
+	nop
+#endif
+
+	move ra, t3
     jr      ra
     nop
     .end    ddr2_config
@@ -1796,7 +1888,7 @@ DDR2_CTL_05_DATA_HI:    .word 0x00000000
 //00000_010 trtp 00000_101 trrd 00000_010 temrs 00000_011 tcke
 DDR2_CTL_06_DATA_LO:    .word 0x03050203 
 //0000_1010 aprebit 00000_100 wrlat 00000_100 twtr 00000_110 twr_int  
-DDR2_CTL_06_DATA_HI:    .word 0x0a040406 #CL=5
+DDR2_CTL_06_DATA_HI:    .word 0x0a040405 #CL=5
 //0000_0000 ecc_c_id 0000_1111 cs_map 0000_1010 caslat_lin_gate 0000_1011 caslat_lin 
 DDR2_CTL_07_DATA_LO:    .word 0x00000a0b #CL=5//cs_map to cs0-cs3
 //0000_0000 max_row_reg 0000_0000 max_col_reg 0000_0100 initaref 0000_0000 ecc_u_id 
@@ -1820,29 +1912,29 @@ DDR2_CTL_11_DATA_HI:    .word 0x5f7f1111
 //00010011 tras_min 00000000 out_of_range_length 00000000 ecc_u_synd 00000000 ecc_c_synd
 DDR2_CTL_12_DATA_LO:    .word 0x13000000
 //0000000_000101010 dll_dqs_delay_bypass_0 00111100 trfc 00000110 trcd_int 
-DDR2_CTL_12_DATA_HI:    .word 0x002a3c06
+DDR2_CTL_12_DATA_HI:    .word 0x00193307
 //DDR2_CTL_12_DATA_HI:    .word 0x000a3c06
 //0000000_000101010 dll_dqs_delay_bypass_2 0000000_000101010 dll_dqs_delay_bypass_1
-DDR2_CTL_13_DATA_LO:    .word 0x002a002a
+DDR2_CTL_13_DATA_LO:    .word 0x00190019
 //0000000_000101010 dll_dqs_delay_bypass_4 0000000_000101010 dll_dqs_delay_bypass_3 
-DDR2_CTL_13_DATA_HI:    .word 0x002a002a
+DDR2_CTL_13_DATA_HI:    .word 0x00190019
 //0000000_000101010 dll_dqs_delay_bypass_6 0000000_000101010 dll_dqs_delay_bypass_5
-DDR2_CTL_14_DATA_LO:    .word 0x002a002a
+DDR2_CTL_14_DATA_LO:    .word 0x00190019
 //0000000_000101010 dll_dqs_delay_bypass_8 0000000_000101010 dll_dqs_delay_bypass_7 
-DDR2_CTL_14_DATA_HI:    .word 0x002a002a
+DDR2_CTL_14_DATA_HI:    .word 0x00190019
 //0000000_000000000 dll_lock 0000000_000100100 dll_increment
-DDR2_CTL_15_DATA_LO:    .word 0x00000001
+DDR2_CTL_15_DATA_LO:    .word 0x00000004
 //0000000_010110100 dqs_out_shift_bypass 0000000_000110000 dll_start_point 
-//DDR2_CTL_15_DATA_HI:    .word 0x00b40030
-DDR2_CTL_15_DATA_HI:    .word 0x00420030  
+//DDR2_CTL_15_DATA_HI:    .word 0x00b40045
+DDR2_CTL_15_DATA_HI:    .word 0x00bc0030  
 //000000_0000000000 int_ack 0000000_010000111 wr_dqs_shift_bypass
 //DDR2_CTL_16_DATA_LO:    .word 0x00000087
-DDR2_CTL_16_DATA_LO:    .word 0x00000032
+DDR2_CTL_16_DATA_LO:    .word 0x0000008c
 //00000_00000000000 int_status 00000_00000000000 int_mask 
 DDR2_CTL_16_DATA_HI:    .word 0x000007ff #no_interrupt 
 //DDR2_CTL_16_DATA_HI:    .word 0x00000000 #no_masked
 //0_000000000010110 emrs1_data 00_01000000011011 tref
-DDR2_CTL_17_DATA_LO:    .word 0x0016101b #half strengh, AL=2, ODT=75ohm
+DDR2_CTL_17_DATA_LO:    .word 0x0026101b #half strengh, AL=2, ODT=75ohm
 //0_000000000000000 emrs2_data_1 0_000000000000000 emrs2_data_0 
 DDR2_CTL_17_DATA_HI:    .word 0x00000000
 //0_000000000000000 emrs2_data_3 0_000000000000000 emrs2_data_2
@@ -1852,13 +1944,13 @@ DDR2_CTL_18_DATA_HI:    .word 0x001c0000
 //0000000011001000 tdll 0000000001101011 tcpd
 DDR2_CTL_19_DATA_LO:    .word 0x00c8006b
 //0110100011110001 tras_max 0000000000000010 tpdex 
-DDR2_CTL_19_DATA_HI:    .word 0x68e10002 
+DDR2_CTL_19_DATA_HI:    .word 0x48e10002 
 //0000000011001000 txsr 0000000000110000 txsnr
-DDR2_CTL_20_DATA_LO:    .word 0x00c80040
+DDR2_CTL_20_DATA_LO:    .word 0x00c80027
 //0000000000000000 xor_check_bits 0000000000000000 version 
 DDR2_CTL_20_DATA_HI:    .word 0x00000000
  //000000000000000000110110 tinit
-DDR2_CTL_21_DATA_LO:    .word 0x00030d40 #real 
+DDR2_CTL_21_DATA_LO:    .word 0x00000190 #real 
 //DDR2_CTL_21_DATA_LO:    .word 0x00000036 #simulation
 //000_0000000000000000000000000000000000000 ecc_c_addr 
 DDR2_CTL_21_DATA_HI:    .word 0x00000000

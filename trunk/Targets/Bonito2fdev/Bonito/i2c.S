@@ -71,6 +71,27 @@
 
 	bal i2cwrite
 	nop
+
+/*	Read ST7 get boot status  */
+	PRINTSTR("Boot Status: ")
+	li	a0, 0x25
+	li	a1, 0x2		//STR status				
+	bal	i2cread
+	nop
+
+	move a0, v0
+
+	sub	 a0, 0x4
+	bnez	 a0, 1f
+
+	/* STR Recovery */
+	or 	sdCfg, 0x80000000
+	
+1:	
+	move a0, v0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
 	
 	b 211f
 	nop
