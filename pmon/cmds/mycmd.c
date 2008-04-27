@@ -1470,33 +1470,40 @@ static int myi2cwrite(int argc,char **argv)
 	v0 |= 0x40;
 	*(volatile unsigned char *)(AddrBase + SMBUS_HOST_CONTROL) = v0;
 
-	do
-	{
-		//Wait
-		for (a0 = 0x1000; a0 != 0;);
-			a0--;
-		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
-	}while(v0 & SMBUS_HOST_STATUS_BUSY);
 
-	v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
-	v0 &= 0x1f;
-	if (v0)
+	if (s1 == 0x24 && s2 == 0 && s3 == 4)
 	{
-		*(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS) = v0;
-		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
-	}
-
-	if (s1 == 0x24 && s2 == 1 && s3 == 4)
-	{
-		unsigned long long state;
+		unsigned long state;
 		printf("Enter STR! \n");
-		*(volatile unsigned long long *)(0xaffffe80) = 0; //Shutdown ODT
+		*(volatile unsigned long *)(0xaffffe80) = 0; //Shutdown ODT
+		*(volatile unsigned long *)(0xaffffe84) = 0; //Shutdown ODT
 
-		state = *(volatile unsigned long long *)(0xaffffe30);
-		state |= 1<<32;
-		*(volatile unsigned long long *)(0xaffffe30) = state;
+		state = *(volatile unsigned long *)(0xaffffe34);
+		printf("0x%x\n", *(volatile unsigned long *)(0xaffffe34));
+		state |= 1;
+		printf("0x%x\n", state);
+		*(volatile unsigned long *)(0xaffffe34) = state;
+		printf("0x%x\n", *(volatile unsigned long *)(0xaffffe34));
+		printf("Set Self Refresh Bit! \n");
 	}
+	else
+	{
+		do
+		{
+			//Wait
+			for (a0 = 0x1000; a0 != 0;);
+				a0--;
+			v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+		}while(v0 & SMBUS_HOST_STATUS_BUSY);
 
+		v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+		v0 &= 0x1f;
+		if (v0)
+		{
+			*(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS) = v0;
+			v0 = *(volatile unsigned char *)(AddrBase + SMBUS_HOST_STATUS);
+		}
+	}
 	return 0;
 }
 
@@ -1567,6 +1574,28 @@ static int myi2cread(int argc,char **argv)
 
 	return 0;
 }
+
+static int cmd_malloc(int argc,char **argv)
+{
+	unsigned long size;
+	char *address;
+	if(argc!=2)return -1;
+	size=strtoul(argv[1],0,0);	//size
+
+	address = (char *)malloc(size);
+
+	printf("0x%x\n", address);
+
+	for (;size >0; size--)
+		{
+			if (size % 2 == 0)
+				*(address+size) = 0x55;
+			else
+				*(address+size) = 0xaa;
+		}
+
+	return 0;	
+}
 //----------------------------------
 static const Cmd Cmds[] =
 {
@@ -1622,6 +1651,7 @@ static const Cmd Cmds[] =
 	{"mycmp","s1 s2 len",0,"mecmp s1 s2 len",mycmp,4,4,CMD_REPEAT},
 	{"i2cwrite","chipId offset value",0,"i2cwrite chipId offset value",myi2cwrite,2,99,CMD_REPEAT},
 	{"i2cread","chidId offset",0,"i2cread chipId offset",myi2cread,2,99,CMD_REPEAT},
+	{"malloc","size",0,"",cmd_malloc,2,99,CMD_REPEAT},
 	{0, 0}
 };
 
