@@ -1,5 +1,7 @@
+{{{
+
 		Video issues with S3 resume
-		~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		
 		  2003-2005, Pavel Machek
 
 During S3 resume, hardware needs to be reinitialized. For most
@@ -179,3 +181,5 @@ the state once saved will be OK for every resume afterwards.
 NOTE: The "rckbd restart" command may be different for your
 distribution. Simply replace it with the command you would use to
 set the fonts on screen.
+
+}}}
