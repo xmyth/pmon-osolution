@@ -8,6 +8,7 @@
   * [ACPI_in_coreboot acpi in a8v-e_se]
   * [ACPI_TABLE_SAMPLE]
   * AcpiTool
+  * [Video issues with S3 resume]
 
 == 分析 ==
 
