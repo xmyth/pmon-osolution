@@ -1,0 +1,393 @@
+;	STMicroelectronics Project file
+
+[Version]
+Keyword=ST7Project
+Number=1.3
+
+[Project]
+Name=st7
+Toolset=ST7 Cosmic
+
+[Config]
+0=Config.0
+1=Config.1
+
+[Config.0]
+ConfigName=Debug
+Target=st7.elf
+OutputFolder=Debug
+Debug=$(TargetFName)
+
+[Config.1]
+ConfigName=Release
+Target=st7.elf
+OutputFolder=Release
+Debug=$(TargetFName)
+
+[Root]
+ElemType=Project
+PathName=st7
+Child=Root.Source Files
+Config.0=Root.Config.0
+Config.1=Root.Config.1
+
+[Root.Config.0]
+Settings.0.0=Root.Config.0.Settings.0
+Settings.0.1=Root.Config.0.Settings.1
+Settings.0.2=Root.Config.0.Settings.2
+Settings.0.3=Root.Config.0.Settings.3
+Settings.0.4=Root.Config.0.Settings.4
+Settings.0.5=Root.Config.0.Settings.5
+Settings.0.6=Root.Config.0.Settings.6
+Settings.0.7=Root.Config.0.Settings.7
+Settings.0.8=Root.Config.0.Settings.8
+
+[Root.Config.1]
+Settings.1.0=Root.Config.1.Settings.0
+Settings.1.1=Root.Config.1.Settings.1
+Settings.1.2=Root.Config.1.Settings.2
+Settings.1.3=Root.Config.1.Settings.3
+Settings.1.4=Root.Config.1.Settings.4
+Settings.1.5=Root.Config.1.Settings.5
+Settings.1.6=Root.Config.1.Settings.6
+Settings.1.7=Root.Config.1.Settings.7
+Settings.1.8=Root.Config.1.Settings.8
+
+[Root.Config.0.Settings.0]
+String.6.0=2008,4,17,20,17,16
+String.100.0=ST Assembler Linker
+String.100.1=ST7 Cosmic
+String.100.2=STM8 Cosmic
+String.100.3=ST7 Metrowerks V1.1
+String.100.4=Raisonance
+String.101.0=ST7 Cosmic
+String.102.0=C:\Program Files\COSMIC\CXST7_16K
+String.103.0=
+String.104.0=Hst7
+String.105.0=Lib
+String.106.0=Debug
+String.107.0=st7.elf
+Int.108=0
+
+[Root.Config.0.Settings.1]
+String.6.0=2008,4,17,20,17,16
+String.100.0=$(TargetFName)
+String.101.0=
+String.103.0=.\;
+
+[Root.Config.0.Settings.2]
+String.2.0=
+String.6.0=2008,4,17,20,17,16
+String.100.0=ST7FLI49MK1T6
+
+[Root.Config.0.Settings.3]
+String.2.0=Compiling $(InputFile)...
+String.3.0=cxst7 $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) +modml -customDebCompat -no -customC-pp -customLst -l $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,18,0,44,48
+
+[Root.Config.0.Settings.4]
+String.2.0=Assembling $(InputFile)...
+String.3.0=cast7 -xx -l $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Config.0.Settings.5]
+String.2.0=Running Pre-Link step
+String.6.0=2008,4,17,20,17,16
+String.8.0=
+
+[Root.Config.0.Settings.6]
+String.2.0=Running Linker
+String.3.0=clnk -customMapFile -customMapFile-m $(OutputPath)$(TargetSName).map -fakeRunConv -fakeInteger -fakeAutoGen $(ToolsetLibOpts) -o $(OutputPath)$(TargetSName).st7 -fakeOutFile$(ProjectSFile).elf -customCfgFile $(OutputPath)$(TargetSName).lkf -fakeVectFileinterrupt_vector.c -fakeStartupcrtsx.st7 
+String.3.1=cvdwarf $(OutputPath)$(TargetSName).st7 -fakeVectAddr0xffe0
+String.4.0=$(OutputPath)$(TargetFName)
+String.5.0=
+String.6.0=2008,4,18,22,22,34
+String.100.0=
+String.101.0=crtsi.st7
+String.102.0=+seg .text -b 0xf000 -m 0x1000 -n .text 
+String.102.1=+seg .const -a .text -n .const 
+String.102.2=+seg .bsct -b 0x80 -m 0x80 -n .bsct 
+String.102.3=+seg .ubsct -a .bsct -n .ubsct 
+String.102.4=+seg .share -a .ubsct -n .share -is 
+String.102.5=+seg .data -b 0x100 -m 0x80 -n .data 
+String.102.6=+seg .bss -a .data -n .bss
+String.103.0=Code,Constants[0xf000-0xffff]=.text,.const
+String.103.1=Zero Page[0x80-0xff]=.bsct,.ubsct,.share
+String.103.2=Ram[0x100-0x17f]=.data,.bss
+String.104.0=0x1ff
+Int.0=0
+Int.1=0
+
+[Root.Config.0.Settings.7]
+String.2.0=Running Post-Build step
+String.3.0=chex -o $(OutputPath)$(TargetSName).s19 $(OutputPath)$(TargetSName).st7
+String.6.0=2008,4,17,20,17,16
+
+[Root.Config.0.Settings.8]
+String.2.0=Performing Custom Build on $(InputFile)
+String.6.0=2008,4,17,20,17,16
+
+[Root.Config.1.Settings.0]
+String.6.0=2008,4,17,20,17,16
+String.100.0=ST Assembler Linker
+String.100.1=ST7 Cosmic
+String.100.2=STM8 Cosmic
+String.100.3=ST7 Metrowerks V1.1
+String.100.4=Raisonance
+String.101.0=ST7 Cosmic
+String.102.0=C:\Program Files\COSMIC\CXST7_16K
+String.103.0=
+String.104.0=Hst7
+String.105.0=Lib
+String.106.0=Release
+String.107.0=st7.elf
+Int.108=0
+
+[Root.Config.1.Settings.1]
+String.6.0=2008,4,17,20,17,16
+String.100.0=$(TargetFName)
+String.101.0=
+String.103.0=.\;
+
+[Root.Config.1.Settings.2]
+String.2.0=
+String.6.0=2008,4,17,20,17,16
+String.100.0=ST7FLI49MK1T6
+
+[Root.Config.1.Settings.3]
+String.2.0=Compiling $(InputFile)...
+String.3.0=cxst7 +modm -customC-pp $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Config.1.Settings.4]
+String.2.0=Assembling $(InputFile)...
+String.3.0=cast7 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Config.1.Settings.5]
+String.2.0=Running Pre-Link step
+String.6.0=2008,4,17,20,17,16
+
+[Root.Config.1.Settings.6]
+String.2.0=Running Linker
+String.3.0=clnk -fakeRunConv -fakeInteger -fakeAutoGen $(ToolsetLibOpts) -o $(OutputPath)$(TargetSName).st7 -fakeOutFile$(ProjectSFile).elf -customCfgFile $(OutputPath)$(TargetSName).lkf -fakeVectFileinterrupt_vector.c -fakeStartupcrtsi.st7 
+String.3.1=cvdwarf $(OutputPath)$(TargetSName).st7 -fakeVectAddr0xffe0
+String.4.0=$(OutputPath)$(TargetFName)
+String.5.0=$(OutputPath)$(TargetSName).map $(OutputPath)$(TargetSName).st7 $(OutputPath)$(TargetSName).s19
+String.6.0=2008,4,18,22,22,34
+String.101.0=crtsi.st7
+String.102.0=+seg .text -b 0xf000 -m 0x1000 -n .text 
+String.102.1=+seg .const -a .text -n .const 
+String.102.2=+seg .bsct -b 0x80 -m 0x80 -n .bsct 
+String.102.3=+seg .ubsct -a .bsct -n .ubsct 
+String.102.4=+seg .share -a .ubsct -n .share -is 
+String.102.5=+seg .data -b 0x100 -m 0x80 -n .data 
+String.102.6=+seg .bss -a .data -n .bss
+String.103.0=Code,Constants[0xf000-0xffff]=.text,.const
+String.103.1=Zero Page[0x80-0xff]=.bsct,.ubsct,.share
+String.103.2=Ram[0x100-0x17f]=.data,.bss
+String.104.0=0x1ff
+Int.0=0
+Int.1=0
+
+[Root.Config.1.Settings.7]
+String.2.0=Running Post-Build step
+String.3.0=chex -o $(OutputPath)$(TargetSName).s19 $(OutputPath)$(TargetSName).st7
+String.6.0=2008,4,17,20,17,16
+
+[Root.Config.1.Settings.8]
+String.2.0=Performing Custom Build on $(InputFile)
+String.6.0=2008,4,17,20,17,16
+
+[Root.Source Files]
+ElemType=Folder
+PathName=Source Files
+Child=Root.Source Files.smbs.c
+Next=Root.Include Files
+Config.0=Root.Source Files.Config.0
+Config.1=Root.Source Files.Config.1
+
+[Root.Source Files.Config.0]
+Settings.0.0=Root.Source Files.Config.0.Settings.0
+Settings.0.1=Root.Source Files.Config.0.Settings.1
+Settings.0.2=Root.Source Files.Config.0.Settings.2
+Settings.0.3=Root.Source Files.Config.0.Settings.3
+
+[Root.Source Files.Config.1]
+Settings.1.0=Root.Source Files.Config.1.Settings.0
+Settings.1.1=Root.Source Files.Config.1.Settings.1
+Settings.1.2=Root.Source Files.Config.1.Settings.2
+Settings.1.3=Root.Source Files.Config.1.Settings.3
+
+[Root.Source Files.Config.0.Settings.0]
+String.6.0=2008,4,17,20,17,16
+String.8.0=Debug
+Int.0=0
+Int.1=0
+
+[Root.Source Files.Config.0.Settings.1]
+String.2.0=Compiling $(InputFile)...
+String.3.0=cxst7 $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) +modml -customDebCompat -no -customC-pp -customLst -l $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,18,0,44,48
+
+[Root.Source Files.Config.0.Settings.2]
+String.2.0=Assembling $(InputFile)...
+String.3.0=cast7 -xx -l $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Source Files.Config.0.Settings.3]
+String.2.0=Performing Custom Build on $(InputFile)
+String.3.0=
+String.4.0=
+String.5.0=
+String.6.0=2008,4,17,20,17,16
+
+[Root.Source Files.Config.1.Settings.0]
+String.6.0=2008,4,17,20,17,16
+String.8.0=Release
+Int.0=0
+Int.1=0
+
+[Root.Source Files.Config.1.Settings.1]
+String.2.0=Compiling $(InputFile)...
+String.3.0=cxst7 +modm -customC-pp $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Source Files.Config.1.Settings.2]
+String.2.0=Assembling $(InputFile)...
+String.3.0=cast7 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Source Files.Config.1.Settings.3]
+String.2.0=Performing Custom Build on $(InputFile)
+String.3.0=
+String.4.0=
+String.5.0=
+String.6.0=2008,4,17,20,17,16
+
+[Root.Source Files.smbs.c]
+ElemType=File
+PathName=smbs.c
+Next=Root.Source Files.eeprom.c
+
+[Root.Source Files.eeprom.c]
+ElemType=File
+PathName=eeprom.c
+Next=Root.Source Files.interrupt_vector.c
+
+[Root.Source Files.interrupt_vector.c]
+ElemType=File
+PathName=interrupt_vector.c
+Next=Root.Source Files.main.c
+
+[Root.Source Files.main.c]
+ElemType=File
+PathName=main.c
+
+[Root.Include Files]
+ElemType=Folder
+PathName=Include Files
+Child=Root.Include Files.smbs.h
+Config.0=Root.Include Files.Config.0
+Config.1=Root.Include Files.Config.1
+
+[Root.Include Files.Config.0]
+Settings.0.0=Root.Include Files.Config.0.Settings.0
+Settings.0.1=Root.Include Files.Config.0.Settings.1
+Settings.0.2=Root.Include Files.Config.0.Settings.2
+Settings.0.3=Root.Include Files.Config.0.Settings.3
+
+[Root.Include Files.Config.1]
+Settings.1.0=Root.Include Files.Config.1.Settings.0
+Settings.1.1=Root.Include Files.Config.1.Settings.1
+Settings.1.2=Root.Include Files.Config.1.Settings.2
+Settings.1.3=Root.Include Files.Config.1.Settings.3
+
+[Root.Include Files.Config.0.Settings.0]
+String.6.0=2008,4,17,20,17,16
+String.8.0=Debug
+Int.0=0
+Int.1=0
+
+[Root.Include Files.Config.0.Settings.1]
+String.2.0=Compiling $(InputFile)...
+String.3.0=cxst7 $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) +modml -customDebCompat -no -customC-pp -customLst -l $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,18,0,44,48
+
+[Root.Include Files.Config.0.Settings.2]
+String.2.0=Assembling $(InputFile)...
+String.3.0=cast7 -xx -l $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Include Files.Config.0.Settings.3]
+String.2.0=Performing Custom Build on $(InputFile)
+String.3.0=
+String.4.0=
+String.5.0=
+String.6.0=2008,4,17,20,17,16
+
+[Root.Include Files.Config.1.Settings.0]
+String.6.0=2008,4,17,20,17,16
+String.8.0=Release
+Int.0=0
+Int.1=0
+
+[Root.Include Files.Config.1.Settings.1]
+String.2.0=Compiling $(InputFile)...
+String.3.0=cxst7 +modm -customC-pp $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Include Files.Config.1.Settings.2]
+String.2.0=Assembling $(InputFile)...
+String.3.0=cast7 $(ToolsetIncOpts) -o$(IntermPath)$(InputName).$(ObjectExt) $(InputFile)
+String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
+String.5.0=$(IntermPath)$(InputName).ls
+String.6.0=2008,4,17,20,17,16
+
+[Root.Include Files.Config.1.Settings.3]
+String.2.0=Performing Custom Build on $(InputFile)
+String.3.0=
+String.4.0=
+String.5.0=
+String.6.0=2008,4,17,20,17,16
+
+[Root.Include Files.smbs.h]
+ElemType=File
+PathName=smbs.h
+Next=Root.Include Files.common.h
+
+[Root.Include Files.common.h]
+ElemType=File
+PathName=common.h
+Next=Root.Include Files.eeprom.h
+
+[Root.Include Files.eeprom.h]
+ElemType=File
+PathName=eeprom.h
+Next=Root.Include Files.st7fli49mk1t6.h
+
+[Root.Include Files.st7fli49mk1t6.h]
+ElemType=File
+PathName=st7fli49mk1t6.h
