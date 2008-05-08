@@ -206,7 +206,7 @@ LEAF(ii2c_cfg)
 	andi	v0, 0xf
 	addi	v0, 1
 	mul	t8, v0
-	add	msize, t8
+	addu	msize, t8
 	beq	v0, 1, 1f
 	nop
 	addi	v0, 1
