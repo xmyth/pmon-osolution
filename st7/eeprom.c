@@ -49,7 +49,7 @@ static unsigned char eeprom_data[] =
 	0x00  // CHECK_SUM
 };
 
-unsigned char g_pm_status_his = PM_STATUS_ABNORMAL;
+unsigned char g_pm_status_his = PM_STATUS_NULL;
 
 PM_STATUS eeprom_init() {
 
@@ -145,7 +145,7 @@ void eeprom_update_status(PM_STATUS pm_status) {
 		
 		eeprom_data[IDX_PM_STATUS] = pm_status;
 	} else if (pm_status == PM_STATUS_STR_RESUME) {
-		
+		g_pm_status_his = PM_STATUS_STR;		
 		eeprom_data[IDX_PM_STATUS] = PM_STATUS_POWERON;
 	} 
 	eeprom_data[IDX_CHECKSUM] = crc8_calc(0, eeprom_data, sizeof(eeprom_data) - 1);
@@ -165,6 +165,12 @@ PM_STATUS eeprom_get_status(void) {
 
 PM_STATUS eeprom_get_cfg(void) {
 	return (PM_STATUS) eeprom_data[IDX_PM_BOOT_CFG];
+}
+
+PM_STATUS eeprom_get_status_his(void) {
+	PM_STATUS ret = g_pm_status_his;
+	g_pm_status_his = PM_STATUS_NULL;
+	return ret;
 }
 
 unsigned char crc8_calc(unsigned char val, unsigned char *ptr, int length) {
