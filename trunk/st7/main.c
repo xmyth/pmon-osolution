@@ -171,6 +171,11 @@ void sys_power(PM_STATUS pm_status) {
 		}; break;
 		case PM_STATUS_STR:
 		{
+			unsigned char i, j, k;				
+			for (i = 0; i < 255; i++)
+				for (j = 0; j < 255; j++)
+					for (k = 0; k < 20; k++)
+						;		
 			SetBit (PADR, 4);
 			ClrBit (PADR, 5);
 		}; break;

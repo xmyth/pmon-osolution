@@ -27,6 +27,7 @@ DEF_8BIT_REG_AT(E_CHECK_SUM, 0x1005);
 extern PM_STATUS eeprom_init(void);
 extern PM_STATUS eeprom_get_status(void);
 extern PM_STATUS eeprom_get_cfg(void);
+extern PM_STATUS eeprom_get_status_his(void);
 
 extern void eeprom_update_status(PM_STATUS);
 

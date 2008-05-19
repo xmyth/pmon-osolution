@@ -120,6 +120,10 @@ return;
 			{
 				I2CDR = eeprom_get_cfg();
 			}
+			else if (I2COffset == 2)
+			{
+				I2CDR = eeprom_get_status_his();
+			}
 			else
 			{
 				I2CDR = 0xaa;
