@@ -765,7 +765,7 @@ not_locked:
 #endif
         
     ###disable the reg space###
-#if 0
+#if 1
 	TTYDBG	("\r\ndisable register space of MEMORY\r\n")
         li  t2,0xbfe00180
         ld  a1,0x0(t2)
@@ -870,7 +870,7 @@ do_caches:
 #endif
 
 	and	t1, t3, 0x10
-	addu	s6, t1, 16		/* s6 = D cache line size */
+	addu	 t8, t1, 16		/* t8 = D cache line size */
 	TTYDBG("Init caches...\r\n")
 
 	li	s7, 0                   /* no L2 cache */
@@ -882,7 +882,7 @@ do_caches:
         bne     a0,a1,1f
         nop
 #endif
-	TTYDBG("godson2 caches found\r\n")
+	TTYDBG("Loongson Caches Found\r\n")
         bal     godson2_cache_init
         nop
 
@@ -903,72 +903,28 @@ do_caches:
 	TTYDBG("\r\n\r\n")
 #endif
 
-/* zhb */
-#if 0
-/*	li	t0, 0		*/
-/*	li	t1, 0x90000	*/
-/*1:	addiu	t0, 1		*/
-/*	bne	t0, t1, 1b	*/
+	srl  sdCfg, 31
+
+	beqz sdCfg, bootnow
 	nop
 
-	TTYDBG("Testing memory...\r\n")
+	PRINTSTR("Restore From STR!\r\n");
 	
-	li	t7, 10
-tmem:
-	li	t0, 0xa0000000+1*1024*1024
-	li	t1, 0xa0000000
-	li	t2, 0xffffffff
-1:
-	sw	t2, 0(t1)
-	lw	t3, 0(t1)
-	bne	t3, t2, 1f
+	PRINTSTR("Version = 0x");
+	ld a0, 0xaff00000
+	dsrl a0, 32
+	bal hexserial
 	nop
-	not	t2
-	sw	t2, 0(t1)
-	lw	t3, 0(t1)
-	bne	t3, t2, 1f
+	
+	ld a0, 0xaff00000
+	bal hexserial
 	nop
-	not	t2
-	subu	t2, 1
-	addu	t1, 4
-	beq	t1, t0, 2f
-	nop
-	and	t4, t1, 0x000fffff
-	bnez	t4, skipdot
-	li	a0, '.'
-	bal	tgt_putchar
-	nop
-skipdot:
-	b	1b
-	nop
-1:
-	TTYDBG("Memory test failed at ");
-	move	a0,	t1
-	bal	hexserial
-	nop
-	TTYDBG("\r\nWrite=");
-	move	a0, t2
-	bal	hexserial
-	nop
-	TTYDBG("\r\nRead=");
-	move	a0, t3
-	bal	hexserial
-	nop
-1:
-	b	1b
-	nop
-2:
-	TTYDBG("Testing ok...\r\n");
-	sub	t7,1
-	beqz	t7, 1f
-	nop
-	b	tmem
-	nop
-1:	
-	b	1b
-	nop
-#endif
-#include "machine/newtest/mydebug.S"
+	PRINTSTR("\r\n")
+
+	
+	
+	
+
 bootnow:
 	TTYDBG("Copy PMON to execute location...\r\n")
 #ifdef DEBUG_LOCORE
