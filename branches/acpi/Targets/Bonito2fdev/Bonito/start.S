@@ -157,6 +157,70 @@
 
 #define DDR_DQ 0xbff00030             /*  zgj  */
 
+#define PCICONF_WRITEB(dev,func,reg,data) \
+	li      a0,CFGADDR(dev,func,reg); \
+	li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
+        and     a2,a0,0xffff; \
+	or      a1,a2; \
+	srl     a0,16; \
+	li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
+    	sw      a0,BONITO_PCIMAP_CFG(bonito); \
+    	lw      zero,BONITO_PCIMAP_CFG(bonito); \
+    	or	a0,zero,data; \
+	sb      a0,(a1);
+
+#define PCICONF_WRITEW(dev,func,reg,data) \
+	li      a0,CFGADDR(dev,func,reg); \
+	li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
+        and     a2,a0,0xffff; \
+	or      a1,a2; \
+	srl     a0,16; \
+	li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
+    	sw      a0,BONITO_PCIMAP_CFG(bonito); \
+    	lw      zero,BONITO_PCIMAP_CFG(bonito); \
+    	or	a0,zero,data; \
+	sw      a0,(a1);
+#define PCICONF_ORB(dev,func,reg,data) \
+	li      a0,CFGADDR(dev,func,reg); \
+        li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
+        and     a2,a0,0xffff; \
+        or      a1,a2; \
+        srl     a0,16; \
+        li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
+        sw      a0,BONITO_PCIMAP_CFG(bonito); \
+        lw      zero,BONITO_PCIMAP_CFG(bonito); \
+    	lbu	a2,(a1); \
+    	ori	a2,data; \
+        sw      a0,BONITO_PCIMAP_CFG(bonito); \
+        lw      zero,BONITO_PCIMAP_CFG(bonito); \
+    	sb	a2,(a1);
+#define PCICONF_READB(dev,func,reg) \
+		li      a0,CFGADDR(dev,func,reg); \
+		li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
+		and     a2,a0,0xffff; \
+		or      a1,a2; \
+		srl     a0,16; \
+		li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
+		sw      a0,BONITO_PCIMAP_CFG(bonito); \
+		lw      zero,BONITO_PCIMAP_CFG(bonito); \
+		lb      a0,(a1);
+#define PCICONF_READW(dev,func,reg) \
+		li      a0,CFGADDR(dev,func,reg); \
+		li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
+		and     a2,a0,0xffff; \
+		or      a1,a2; \
+		srl     a0,16; \
+		li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
+		sw      a0,BONITO_PCIMAP_CFG(bonito); \
+		lw      zero,BONITO_PCIMAP_CFG(bonito); \
+		lw      a0,(a1);
+
+#define SUPERIO_WR(idx,data) \
+        li 	v0,BONITO_PCIIO_BASE_VA+0x3f0; \
+        or      v1,zero,idx; \
+        sb      v1,(v0); \
+        or 	v1,zero,data; \
+        sb      v1,1(v0);
 /*
  *   Register usage:
  *
@@ -859,7 +923,7 @@ do_caches:
 
 	and	t1, t3, 0x20
 	srl	t1, t1, 1
-	addu	s4, t1, 16		/* s4 = I cache line size */
+	//addu	s4, t1, 16		/* s4 = I cache line size */
 
 	srl	t1, t3, 6
 	and	t1, 3
@@ -883,16 +947,22 @@ do_caches:
         nop
 #endif
 	TTYDBG("Loongson Caches Found\r\n")
+/*
+		mfc0   a0,COP_0_CONFIG
+        and    a0,a0,~((1<<12) | 3)
+		or     a0,a0,3
+        mtc0   a0,COP_0_CONFIG
+*/		
         bal     godson2_cache_init
         nop
 
 	/* close L2 cache */
-	li      a0, 0xbfe00164
+/*	li      a0, 0xbfe00164
         sw      zero, 0(a0);
-
+*/
         mfc0   a0,COP_0_CONFIG
         and    a0,a0,~((1<<12) | 3)
-	or     a0,a0,2
+		or     a0,a0,2
         mtc0   a0,COP_0_CONFIG
 
 #ifdef DEBUG_LOCORE
@@ -905,26 +975,731 @@ do_caches:
 
 	srl  sdCfg, 31
 
+li a0, 0xbfe00010
+li a1, 0x80000000
+sw a1, 0(a0)
+li a0, 0xbfe00014
+sw zero, 0(a0)
+li a0, 0xbfe00018
+li a1, 0x70000000
+sw a1, 0(a0)
+li a0, 0xbfe00040
+li a1, 0x80000000
+sw a1, 0(a0)
+li a0, 0xbfe00044
+li a1, 0xf0000000
+sw a1, 0(a0)
+
+li k0, 0xbfe00000
+li k1, 0x46140
+sw k1, 0x110(k0)
+li k1, 0x80000000
+sw k1, 0x10(k0)
+sw zero,  0x14(k0)
+li k1, 0x8000000c
+sw k1, 0x150(k0)
+li k1, 0xffffffff
+sw k1, 0x154(k0)
+li k1, 0x00fe0105
+sw k1, 0x168(k0)
+
+	bal pci_test
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 0, 0x48, 0x1)
+	nop
+
+	PCICONF_READB(PCI_IDSEL_VIA686B, 0, 0x4a)
+	nop
+
+	andi a0, 0xf0
+	ori  a0, 4
+	
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 0, 0x4a, a0)
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x4, 7)
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x9, 0x8a)
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x0d, 0xd0)
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x3d, 0)
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x40, 0xb)
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x41, 2) 
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x43, 0xa) 
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x44, 0x0) 
+	nop
+
+	PCICONF_WRITEB(PCI_IDSEL_VIA686B, 5, 0x45, 0) 
+	nop
+
+	PCICONF_WRITEW(PCI_IDSEL_VIA686B, 5, 0x10, 0x1f1) 
+	nop
+
+	PCICONF_WRITEW(PCI_IDSEL_VIA686B, 5, 0x14, 0x3f5) 
+	nop
+
+	PCICONF_WRITEW(PCI_IDSEL_VIA686B, 5, 0x18, 0x171) 
+	nop
+
+	PCICONF_WRITEW(PCI_IDSEL_VIA686B, 5, 0x1c, 0x375) 
+	nop
+
+	PCICONF_WRITEW(PCI_IDSEL_VIA686B, 5, 0x20, 0xcc1) 
+	nop
+
+
+
+
+	bal pci_test
+	nop
+	
 	beqz sdCfg, bootnow
 	nop
 
-	PRINTSTR("Restore From STR!\r\n");
-	
-	PRINTSTR("Version = 0x");
-	ld a0, 0xaff00000
-	dsrl a0, 32
-	bal hexserial
-	nop
-	
-	ld a0, 0xaff00000
+	PRINTSTR("PC = 0x");
+	lw a0, 0xafe00200
 	bal hexserial
 	nop
 	PRINTSTR("\r\n")
 
+	PRINTSTR("SP = 0x");
+	ld a0, 0xafe000e0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+
+	PRINTSTR("CP0 Reg: \r\n");
+	PRINTSTR("Index:\t\t");
+	dmfc0 a0, $0
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+
+	ld a0, 0xafe00100
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Random:\t\t");
+	dmfc0 a0, $1
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+
+	ld a0, 0xafe00108
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("EntryLo0:\t");
+	dmfc0 a0, $2
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+
+	ld a0, 0xafe00110
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("EntryLo1:\t");
+	dmfc0 a0, $3
+	bal hexserial
+	nop
+	PRINTSTR("\t");
 	
+	ld a0, 0xafe00118
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Context:\t");
+	dmfc0 a0, $4
+	bal hexserial
+	nop
+	PRINTSTR("\t");
 	
+	ld a0, 0xafe00120
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("PageMask:\t");
+	dmfc0 a0, $5
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00128
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Wired:\t\t")
+	dmfc0 a0, $6
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00130
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Reserved:\t")
+	dmfc0 a0, $7
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00138
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("BadVaddr:\t")
+	dmfc0 a0, $8
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00140
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Count:\t\t")
+	dmfc0 a0, $9
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00148
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("EntryHi:\t")
+	dmfc0 a0, $10
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00150
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Compare:\t")
+	dmfc0 a0, $11
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00158
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Status:\t\t")
+	dmfc0 a0, $12
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00160
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Cause:\t\t")
+	dmfc0 a0, $13
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00168
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("EPC:\t\t")
+	dmfc0 a0, $14
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00170
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("PRID:\t\t")
+	dmfc0 a0, $15
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00178
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Config:\t\t")
+	dmfc0 a0, $16
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00180
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("LLAddr:\t\t")
+	dmfc0 a0, $17
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00188
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Watch:\t\t")
+	dmfc0 a0, $18
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00190
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Reserved:\t")
+	dmfc0 a0, $19
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe00198
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Xcontext:\t")
+	dmfc0 a0, $20
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001a0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Reserved:\t")
+	dmfc0 a0, $21
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001a8
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Diagnose:\t")
+	dmfc0 a0, $22
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001b0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Reserved:\t")
+	dmfc0 a0, $23
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001b8
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("PCLo:\t\t")
+	dmfc0 a0, $24
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001c0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("PCHi:\t\t")
+	dmfc0 a0, $25
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001c8
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Reserved:\t")
+	dmfc0 a0, $26
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001d0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Reserved:\t")
+	dmfc0 a0, $27
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001d8
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("TagLo:\t\t")
+	dmfc0 a0, $28
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001e0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("TagHi:\t\t")
+	dmfc0 a0, $29
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001e8
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("ErrorEPC:\t")
+	dmfc0 a0, $30
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001f0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("Reserved:\t")
+	dmfc0 a0, $31
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	
+	ld a0, 0xafe001f8
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+
+	PRINTSTR("CRC\r\n");
+	ld a0, 0xafe00300
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	ld a0, 0xafe00308
+	bal hexserial
+	nop
+	PRINTSTR("\r\n");
+/*
+	li k0, 0x803892b0
+	move a0, zero
+	li a1, 0xa0000000
+	li a2,  0xfe00000
+	jalr k0
+	nop
+	move a0, v0
+	bal hexserial
+	nop
+	PRINTSTR("\t");
+	move a0, zero
+	li a1, 0x80000000
+	li a2,  0xfe00000
+	jalr k0
+	nop
+	move a0,v0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n");
+*/	
 	
 
+	ld k0, 0xafe00120
+	nop
+	dmtc0 k0, $4
+	ld k0, 0xafe00128
+	nop
+	dmtc0 k0, $5
+	ld k0, 0xafe001a0
+	nop
+	dmtc0 k0, $20
+
+	ld k0, 0xafe00170
+	nop
+	dmtc0 k0, $14
+
+	ld k0, 0xafe00168
+	nop
+	dmtc0 k0, $13
+
+	ld k0, 0xafe00148
+	nop
+	dmtc0 k0, $9
+
+	ld k0, 0xafe00158
+	nop
+	dmtc0 k0, $11
+
+	ld k0, 0xafe001f0
+	nop
+	dmtc0 k0, $30
+
+	ld k0, 0xafe00150
+	nop
+	dmtc0 k0, $10
+	
+	ld k0, 0xafe00160
+	nop
+	dmtc0 k0, $12
+	nop
+	nop
+	ld k0, 0xafe00180
+	nop
+
+	dmtc0 k0, $16
+	nop
+	nop
+/*	
+	PRINTSTR("CRC:0x");
+	dli v1, 0xffffffff80389250
+	li a0, 0
+	dli a1, 0xffffffffa0000000
+	li a2, 0xfe00000
+	nop
+	jalr v1
+	nop
+	nop
+	move a0, v0
+	bal hexserial
+	nop
+	PRINTSTR("\t0x");
+
+	ld a0, 0xffffffffafe00208
+	bal hexserial
+	nop
+	PRINTSTR("\r\n");	
+*/
+/*
+
+	PRINTSTR("Dump Stack\r\n");
+	ld k0, 0xafe00000+232
+	ld a0, 0(k0)
+	bal hexserial
+	nop
+	PRINTSTR(" ");
+	ld a0, 8(k0)
+	bal hexserial
+	nop
+	PRINTSTR(" ");
+	ld a0, 16(k0)
+	bal hexserial
+	nop
+	PRINTSTR(" ");
+	ld a0, 24(k0)
+	bal hexserial
+	nop
+	PRINTSTR("\r\n");
+	ld a0, 32(k0)
+	bal hexserial
+	nop
+	PRINTSTR(" ");
+	ld a0, 40(k0)
+	bal hexserial
+	nop
+	PRINTSTR(" ");
+	ld a0, 48(k0)
+	bal hexserial
+	nop
+	PRINTSTR(" ");
+	ld a0, 56(k0)
+	bal hexserial
+	nop
+	PRINTSTR("\r\n");
+*/
+
+	PRINTSTR("Jump to Wakeup\r\n");
+	ld ra, 0xffffffffafe00200
+	nop
+	nop
+	nop
+	nop
+
+	jr ra
+	nop
+
+/*
+	ld t0, 0xaff00000+0x108
+	ld t1, 0xaff00000+0x110
+	ld t2, 0xaff00000+0x118
+	ld t3, 0xaff00000+0x120
+	ld t4, 0xaff00000+0x128
+	and t0,t0,0xfffffffe
+	dmtc0 t0, COP_0_STATUS_REG
+	dmtc0 t1, COP_0_TLB_CONTEXT
+	dmtc0 t2, COP_0_TLB_PG_MASK
+	dmtc0 t3, COP_0_CONFIG
+	dmtc0 t4, COP_0_TLB_XCONTEXT
+	
+
+	PRINTSTR("SP Register = 0x");
+	
+	ld a0, 0xaff00000+0xf0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+
+	PRINTSTR("RETURN ADDR = 0x");
+	
+	ld a0, 0xaff00000+0xf0
+	nop
+	ld a0, 0(a0)
+	nop
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+
+	ld a0, 0xaff00000+0xf0
+	nop
+	ld a0, 8(a0)
+	nop
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+
+	PRINTSTR("CP0 SR = 0x");
+ffffffffffffffffPCI	
+	ld a0, 0xaff00000+0x108
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	PRINTSTR("CRC1 = 0x");
+	ld a0, 0xaff00000+0x130
+	bal hexserial
+	nop
+	PRINTSTR("\r\n")
+	
+
+	PRINTSTR("CRC2 = 0x");
+
+	li a0, 0
+	li a1, 0xaff00000
+	li a2, 0x100
+
+	li v1, 0x80388a30
+	jalr v1
+	nop
+	
+	move a0, v0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n");	
+
+*/
+//	bal i2cwriteSTR
+//	nop
+/*
+	PRINTSTR("i2cwriteSTR = 0x");
+	la a0, i2cwriteSTR
+	bal hexserial
+	nop
+
+	PRINTSTR("\r\nRestore From STR!\r\n");
+*/
+//	li a0, 0xbfc00000
+//	jr a0
+/*	
+	PRINTSTR("Version = 0x");
+	ld a0, 0xaff00000
+	bal hexserial
+	nop
+	
+	PRINTSTR("\r\n")
+
+//	li a0, 0x8080
+	sw a0, 0xaff00000
+	
+
+	PRINTSTR("Return Address = 0x");
+	ld a0, 0xaff00100
+	bal hexserial
+	nop
+
+	PRINTSTR("\r\n");
+*/
+/*	PRINTSTR("CRC3 = 0x");
+
+	li a0, 0
+	li a1, 0xaff00000
+	li a2, 0x100
+
+	li v1, 0x80388a30
+	jalr v1
+	nop
+	
+	move a0, v0
+	bal hexserial
+	nop
+	PRINTSTR("\r\n");	
+
+*/	
+	
+	//ld $0, 0xaff00000+0x8
+	//ld $1, 0xaff00000+0x10
+/*	ld $2, 0xaff00000+0x18
+	ld $3, 0xaff00000+0x20
+	ld $4, 0xaff00000+0x28
+	ld $5, 0xaff00000+0x30
+	ld $6, 0xaff00000+0x38
+	ld $7, 0xaff00000+0x40
+	ld $8, 0xaff00000+0x48
+	ld $9, 0xaff00000+0x50
+	ld $10, 0xaff00000+0x58
+	ld $11, 0xaff00000+0x60
+	ld $12, 0xaff00000+0x68
+	ld $13, 0xaff00000+0x70
+	ld $14, 0xaff00000+0x78
+	ld $15, 0xaff00000+0x80
+	ld $16, 0xaff00000+0x88
+	ld $17, 0xaff00000+0x90
+	ld $18, 0xaff00000+0x98
+	ld $19, 0xaff00000+0xa0
+	ld $20, 0xaff00000+0xa8
+	ld $21, 0xaff00000+0xb0
+	ld $22, 0xaff00000+0xb8
+	ld $23, 0xaff00000+0xc0
+	ld $24, 0xaff00000+0xc8
+	ld $25, 0xaff00000+0xd0
+	ld $26, 0xaff00000+0xd8
+	ld $27, 0xaff00000+0xe0
+	ld $28, 0xaff00000+0xe8
+	ld $29, 0xaff00000+0xf0
+	ld $30, 0xaff00000+0xf8
+	ld $31, 0xaff00000+0x100
+	nop
+	jr $31
+	nop
+*/
 bootnow:
 	TTYDBG("Copy PMON to execute location...\r\n")
 #ifdef DEBUG_LOCORE
@@ -995,7 +1770,7 @@ zhb:
 	move	t0, a0
 	move	t1, a1
 	move	t2, a2
-	/* copy text section */
+	/* copy text section *
 	
 1:	lw	t4, 0(t1)
 	nop
@@ -1044,11 +1819,23 @@ zhb:
 #endif
 //	li	msize,(512<<20)
 
+	TTYDBG("Init caches done1, cfg = ")
+	mfc0	a0, COP_0_CONFIG
+	bal	hexserial
+	nop
+	TTYDBG("\r\n\r\n")
+
+
 	move	a0,msize
 	srl	a0,20
 
+	mfc0	t1, $16
+	sw	t1, 0xaff00040
+
+
+
     /* pass pointer to kseg1 tgt_putchar */
-    la  a1, tgt_putchar
+    la  a1, pci_test 
 	addu a1,a1,s0
 
     la  a2, stringserial
@@ -1127,6 +1914,8 @@ END(CPU_TLBClear)
  *  Set up the TLB. Normally called from start.S.
  */
 LEAF(CPU_TLBInit)
+	move 	t8, ra
+
 	li	a3, 0			# First TLB index.
 
 	li	a2, PG_SIZE_16M
@@ -1154,7 +1943,9 @@ LEAF(CPU_TLBInit)
 	bgtz	a1, 1b
 	addu	a0, a2			# Step address 32Mb.
 
-	jr	ra
+	PRINTSTR("Call TLB Init.\r\n")
+
+	jr	t8
 	nop
 END(CPU_TLBInit)
 
@@ -1186,16 +1977,49 @@ LEAF(outstring)
 	addiu	a1, 1
 	b	1b
 	lbu	a0, 0(a1)
-
-2:
 	j	a2
 	nop
 END(outstring)
 
+LEAF(pci_test)
+	move k0, ra
+	PRINTSTR("PCI READ 0x ")
+	nop
+	li  a2,0x20100  // 1<<(device+11)|(function<<8)                                                                                  
+	li  a3,0                                                                                            
+	lui a1,0xbfe0                                                                                       
+	ori a1,a1,0x4                                                                                       
+	lui a0,0xbfe0                                                                                       
+	lw  v1,0(a1)                                                                                        
+	ori a0,a0,0x118                                                                                 
+	lui v0,0x3000                                                                                   
+	or  v1,v1,v0                                                                                    
+	srl v0,a2,0x10                                                                                  
+	or  v0,v0,a3                                                                                    
+	sw  v1,0(a1)                                                                                    
+	andi    v1,a2,0xfffc                                                                            
+	sw  v0,0(a0)                                                                                    
+	lui v0,0xbfe8                                                                                   
+	or  v1,v1,v0                                                                                    
+	lw  a0,0(v1)                                                                                    
+	andi    v0,a2,0x3                                                                               
+	sll v0,v0,0x3                                                                                   
+	srlv    a0,a0,v0 
+	bal hexserial
+	nop
+	PRINTSTR("PCI READ\r\n ")
+	nop
+	j k0
+END(pci_test)	
+
 LEAF(hexserial)
 	move	a2, ra
+        move	t8, a0
+
+	dsrl 	a0, 32
 	move	a1, a0
-	li	a3, 7
+
+	li	a3, 7 
 1:
 	rol	a0, a1, 4
 	move	a1, a0
@@ -1208,7 +2032,23 @@ LEAF(hexserial)
 
 	bnez	a3, 1b
 	addu	a3, -1
+	
+	move	a0, t8
+	move    a1, a0
+	li	a3, 7 
+1:
+	rol	a0, a1, 4
+	move	a1, a0
+	and	a0, 0xf
+	la	v0, hexchar
+	addu	v0, s0
+	addu	v0, a0
+	bal	tgt_putchar
+	lbu	a0, 0(v0)
 
+	bnez	a3, 1b
+	addu	a3, -1
+	
 	j	a2
 	nop
 END(hexserial)
@@ -1524,49 +2364,6 @@ cache_init_panic:
 	nop
 	.end	godson2_cache_init
 
-#define PCICONF_WRITEB(dev,func,reg,data) \
-	li      a0,CFGADDR(dev,func,reg); \
-	li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
-        and     a2,a0,0xffff; \
-	or      a1,a2; \
-	srl     a0,16; \
-	li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
-    	sw      a0,BONITO_PCIMAP_CFG(bonito); \
-    	lw      zero,BONITO_PCIMAP_CFG(bonito); \
-    	or	a0,zero,data; \
-	sb      a0,(a1);
-
-#define PCICONF_WRITEW(dev,func,reg,data) \
-	li      a0,CFGADDR(dev,func,reg); \
-	li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
-        and     a2,a0,0xffff; \
-	or      a1,a2; \
-	srl     a0,16; \
-	li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
-    	sw      a0,BONITO_PCIMAP_CFG(bonito); \
-    	lw      zero,BONITO_PCIMAP_CFG(bonito); \
-    	or	a0,zero,data; \
-	sw      a0,(a1);
-#define PCICONF_ORB(dev,func,reg,data) \
-	li      a0,CFGADDR(dev,func,reg); \
-        li      a1,PHYS_TO_UNCACHED(PCI_CFG_SPACE); \
-        and     a2,a0,0xffff; \
-        or      a1,a2; \
-        srl     a0,16; \
-        li      a2,BONITO_BASE+BONITO_PCIMAP_CFG; \
-        sw      a0,BONITO_PCIMAP_CFG(bonito); \
-        lw      zero,BONITO_PCIMAP_CFG(bonito); \
-    	lbu	a2,(a1); \
-    	ori	a2,data; \
-        sw      a0,BONITO_PCIMAP_CFG(bonito); \
-        lw      zero,BONITO_PCIMAP_CFG(bonito); \
-    	sb	a2,(a1);
-#define SUPERIO_WR(idx,data) \
-        li 	v0,BONITO_PCIIO_BASE_VA+0x3f0; \
-        or      v1,zero,idx; \
-        sb      v1,(v0); \
-        or 	v1,zero,data; \
-        sb      v1,1(v0);
 
 #define E2_EPP 2
 #define E2_S1 (1<<2)
@@ -1623,10 +2420,6 @@ ddr2_config:
       bal	hexserial
 	nop
 	PRINTSTR(" = ")
-	ld 	a0, 0(t2)
-    	dsrl    a0, 32
-    	bal		hexserial
-      nop
 	ld 	a0, 0(t2)
 	bal	hexserial
 	nop
@@ -1791,10 +2584,6 @@ reg_write:
 	bal	hexserial
 	nop
 	PRINTSTR(" = ")
-	ld 	a0, 0(t2)
-    	dsrl    a0, 32
-    	bal		hexserial
-      nop
 	ld 	a0, 0(t2)
 	bal	hexserial
 	nop
