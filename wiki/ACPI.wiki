@@ -13,6 +13,7 @@
 == 分析 ==
 
   * [AcpiInepia epia-m中ACPI实现简单分析]
+  * [Suspend To Disk 流程分析]
 
 == Useful Website ==
   * [http://www.acpi.info ACPI spec]
