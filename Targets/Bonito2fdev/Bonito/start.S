@@ -1066,6 +1066,8 @@ sw k1, 0x168(k0)
 	bal pci_test
 	nop
 	
+//	li sdCfg, 0
+
 	beqz sdCfg, bootnow
 	nop
 
