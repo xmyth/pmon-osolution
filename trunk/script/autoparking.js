@@ -139,7 +139,7 @@ function ap_reload(){
 }
 function ap_to_reload(m){
 	var r = Math.random();
-	var ms = m*60*1000;
+	var ms = m*30*1000;
 	window.setTimeout(ap_reload,ms);
 }
 function ap_get_runningcar(){
