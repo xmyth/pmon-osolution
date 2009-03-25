@@ -304,39 +304,3 @@ function cngm_append(){
 	ot.insertBefore(od,obefore); 
 	//document.getElementById("otd").innerHTML="";
 }
-
-var Cookie = { 
-  PREFIX:'_greasekit', 
-  get: function( name ){ 
-    var nameEQ = escape(Cookie._buildName(name)) + "=", ca = document.cookie.split(';'); 
-    for (var i = 0, c; i < ca.length; i++) { 
-      c = ca[i]; 
-      while (c.charAt(0) == ' ') c = c.substring(1, c.length); 
-      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length); 
-    } 
-    return null; 
-  }, 
-  set: function( name, value, options ){ 
-    options = (options || {}); 
-    if ( options.expiresInOneYear ){ 
-      var today = new Date(); 
-      today.setFullYear(today.getFullYear()+1, today.getMonth, today.getDay()); 
-      options.expires = today; 
-    } 
-    var curCookie = escape(Cookie._buildName(name)) + "=" + escape(value) + 
-      ((options.expires) ? "; expires=" + options.expires.toGMTString() : "") + 
-      ((options.path)    ? "; path="    + options.path : "") + 
-      ((options.domain)  ? "; domain="  + options.domain : "") + 
-      ((options.secure)  ? "; secure" : ""); 
-    document.cookie = curCookie; 
-  }, 
-  hasCookie: function( name ){ 
-    return document.cookie.indexOf( escape(Cookie._buildName(name)) ) > -1; 
-  }, 
-  _buildName: function(name){ 
-    return Cookie.PREFIX + '_' + name; 
-  } 
-}; 
-
-if(typeof GM_getValue === "undefined") GM_getValue = Cookie.get; 
-if(typeof GM_setValue === "undefined") GM_setValue = Cookie.set; 
