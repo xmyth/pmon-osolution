@@ -154,12 +154,12 @@ function ap_get_runningcar(){
 		var car = v_userdata.car[i];		
 		if(car.park_profit>profittomove){
 			carlist.push(car);
-            profittomove = 500;
+            GM_setValue("kaixinmoney",500);
 		}
 	}
 	if (carlist.length == 0)
     {
-        profittomove = 4000;
+        GM_setValue("kaixinmoney",4000);
 		return false;
     }
 	return carlist[Math.floor(Math.random()*carlist.length)];
@@ -275,7 +275,7 @@ if(location.search=="?aid=1040&url=index.php"||location.search=="?aid=1040"||loc
 	
 	
 }
-var runningcar,emptyfriend,carport,callback,lastparkings,apwarning,profittomove=4000;
+var runningcar,emptyfriend,carport,callback,lastparkings,apwarning,profittomove=GM_getValue("kaixinmoney", 4000);
 
 if(location.search=="?aid=1040&url=index.php"||location.search=="?aid=1040"||location.href.indexOf("~parking/index.php")>-1){
 	//================add by cngmclub==============//
