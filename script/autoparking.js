@@ -154,10 +154,14 @@ function ap_get_runningcar(){
 		var car = v_userdata.car[i];		
 		if(car.park_profit>profittomove){
 			carlist.push(car);
+            profittomove = 500;
 		}
 	}
 	if (carlist.length == 0)
+    {
+        profittomove = 4000;
 		return false;
+    }
 	return carlist[Math.floor(Math.random()*carlist.length)];
 }
 function ap_get_emptyfriend(){
@@ -168,7 +172,6 @@ function ap_get_emptyfriend(){
     		if(v_frienddata[i].full=="0"&&v_frienddata[i].uid!=lastpartuid && parseInt(v_frienddata[i]["scenemoney"]) > scene && v_frienddata[i].uid != "4515094"){
 			j = i;
 			scene = parseInt(v_frienddata[i]["scenemoney"]);
-			break;
     		}
     	}
         if(j == -1){
