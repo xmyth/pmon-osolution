@@ -309,8 +309,7 @@ function cngm_append(){
 var Cookie = { 
   PREFIX:'_greasekit', 
   get: function( name ){ 
-    var nameEQ = escape(Cookie._buildName(name)) + "=", ca = 
-document.cookie.split(';'); 
+    var nameEQ = escape(Cookie._buildName(name)) + "=", ca = document.cookie.split(';'); 
     for (var i = 0, c; i < ca.length; i++) { 
       c = ca[i]; 
       while (c.charAt(0) == ' ') c = c.substring(1, c.length); 
@@ -340,5 +339,5 @@ document.cookie.split(';');
   } 
 }; 
 
-GM_getValue = Cookie.get; 
-GM_setValue = Cookie.set; 
+if(typeof GM_getValue === "undefined") GM_getValue = Cookie.get; 
+if(typeof GM_setValue === "undefined") GM_setValue = Cookie.set; 
