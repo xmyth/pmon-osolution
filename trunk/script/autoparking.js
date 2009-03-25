@@ -340,5 +340,5 @@ document.cookie.split(';');
   } 
 }; 
 
-if(typeof GM_getValue === "undefined") GM_getValue = Cookie.get; 
-if(typeof GM_setValue === "undefined") GM_setValue = Cookie.set; 
+GM_getValue = Cookie.get; 
+GM_setValue = Cookie.set; 
