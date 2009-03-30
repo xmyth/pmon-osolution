@@ -354,13 +354,35 @@ function gxdWater(fuid, farmNum) {
 
 //reload current webpage
 function ap_reload(){
-	location.href = location.href;
+	window.location.reload(true); 
 }
 
 //reload this page every 10 minutes.
-var ms = 10*60*1000;
-window.setTimeout(ap_reload,ms);
+var ms = 600;
+//window.setTimeout(ap_reload,ms);
 
+
+var second = ms;
+
+var x = document.createElement("div");
+x.id = "m-btn-o";
+x.innerHTML = "<style>#m-btn-o{border:solid 2px red;background-color:#ccc;left:1080px;top:110px;position:absolute;}</style><div class='body' id='second'></div>";
+document.body.appendChild(x);
+var btn = document.getElementById("second");	
+
+function displaySecond()
+{
+    btn.innerHTML = second.toString();
+    
+    second = second - 1;
+
+    if (second == 0)
+        ap_reload();
+    
+    setTimeout(displaySecond,1000) 
+}
+
+setTimeout(displaySecond,1000);
 //start steal!!!!!!!!!
 gxdBegin();
 
