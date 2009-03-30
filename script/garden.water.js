@@ -71,7 +71,7 @@ function gxdWater(fuid, farmNum) {
 
 	GM_xmlhttpRequest({
 		method : 'GET',
-		url : water_url + '?fuid=' + fuid + '&verify' + verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random(),
+		url : water_url + '?fuid=' + fuid + '&verify' + g_verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random(),
 		onload:function(o){;},//{GM_log("gxdWater done");},
 		onfaiure : function(o){GM_log("gxdWater fail");}
 	});
