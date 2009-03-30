@@ -21,13 +21,10 @@ function searchFriend()
 
 function gxdConf(uid) 
 {
-	var xurl = conf_url + '?fuid=' + uid + '&r=' + Math.random() + '&verify=' + g_verify; 
-    //GM_log(xurl);
-//GM_log("Begin");
-	GM_xmlhttpRequest( {
-		method : "GET",
-		url : xurl,
-		onload : function(o) {
+	var pp= Math.round((Math.random()) * 100000000);
+	var url = "/house/garden/friend_ajax.php";
+	var pars = "verify=" + g_verify + "&fuid="+fuid+"&r="+pp;
+	var myAjax = new Ajax.Request(url, {method: "post", parameters: pars, onComplete: function(o) {
 			var txt = o.responseText;
 			// 没有安装该应用
 			if(txt.substr(0, 5).replace(/(\s*)/,"") != "<conf") {
@@ -64,8 +61,7 @@ function gxdConf(uid)
 				GM_log(e);
 				GM_log(txt);
 			}
-		}
-	});
+		});
 }
 
 function gxdWater(fuid, farmNum) {
