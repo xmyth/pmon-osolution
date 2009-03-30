@@ -61,7 +61,7 @@ function gxdConf(uid)
 				GM_log(e);
 				GM_log(txt);
 			}
-		});
+		}});
 }
 
 function gxdWater(fuid, farmNum) {
