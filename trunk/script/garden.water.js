@@ -5,6 +5,8 @@
 // @include        http://www.kaixin001.com/!house/garden/index.php*
 // ==/UserScript==
 
+var conf_url = 'http://www.kaixin001.com/house/garden/getconf.php';
+
 setTimeout(searchFriend,5000);
 
 function searchFriend()
