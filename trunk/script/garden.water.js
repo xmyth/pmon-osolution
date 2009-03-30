@@ -21,7 +21,7 @@ function searchFriend()
 
 function gxdConf(uid) 
 {
-	var xurl = conf_url + '?fuid=' + uid + '&r=' + Math.random() + '&verify=' + verify; 
+	var xurl = conf_url + '?fuid=' + uid + '&r=' + Math.random() + '&verify=' + g_verify; 
     //GM_log(xurl);
 //GM_log("Begin");
 	GM_xmlhttpRequest( {
