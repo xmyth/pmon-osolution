@@ -7,7 +7,7 @@
 
 var conf_url = 'http://www.kaixin001.com/house/garden/getconf.php';
 
-setTimeout(searchFriend,5000);
+setTimeout(searchFriend,300000);
 
 function searchFriend()
 {
