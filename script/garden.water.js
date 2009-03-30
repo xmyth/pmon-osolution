@@ -15,7 +15,7 @@ function searchFriend()
     
     gxdConf(g_prevuid);
     
-    setTimeout(searchFriend,10000);
+    setTimeout(searchFriend,300000);
 }
 
 
