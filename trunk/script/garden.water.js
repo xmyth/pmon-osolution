@@ -1,0 +1,80 @@
+// ==UserScript==
+// @name           kaixin.app.garden.water
+// @namespace      Kaixin.app.garden.water
+// @description    Garden for kaixin001.com
+// @include        http://www.kaixin001.com/!house/garden/index.php*
+// ==/UserScript==
+
+setTimeout(searchFriend,5000);
+
+function searchFriend()
+{
+    gotoLFriend();
+    
+    gxdConf(g_prevuid);
+    
+    setTimeout(searchFriend,10000);
+}
+
+
+function gxdConf(uid) 
+{
+	var xurl = conf_url + '?fuid=' + uid + '&r=' + Math.random() + '&verify=' + verify; 
+    //GM_log(xurl);
+//GM_log("Begin");
+	GM_xmlhttpRequest( {
+		method : "GET",
+		url : xurl,
+		onload : function(o) {
+			var txt = o.responseText;
+			// 没有安装该应用
+			if(txt.substr(0, 5).replace(/(\s*)/,"") != "<conf") {
+				return;
+			}
+			// 去掉某些不可见字符。
+			txt = txt.replace(/<steal>(.*)<\/steal>/,"");
+
+			var docParser = new DOMParser();
+			try {
+				var doc = docParser.parseFromString(txt,"application/xml");
+				var xml = xml2array(doc);
+				var items = xml.conf.garden.item;
+				var name = xml.conf.account.name
+				//var_dump(xml);
+
+				for(var i in items) {
+					var farmNum = items[i].farmnum;
+					//GM_log(farmNum);
+
+                    var cropsid = items[i].cropsid;
+					if(cropsid < 1) {
+						continue;
+					}
+					var water = items[i].water;
+					if(water < 5) {
+						// XXX to water
+                        GM_log(water + " " + uid);
+						gxdWater(uid, farmNum);
+					}
+				}
+				
+			} catch(e) {
+				GM_log(e);
+				GM_log(txt);
+			}
+		}
+	});
+}
+
+function gxdWater(fuid, farmNum) {
+    //weburl = water_url + '?fuid=' + fuid + '&verify' + verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random();
+    
+    //alert(weburl);
+
+	GM_xmlhttpRequest({
+		method : 'GET',
+		url : water_url + '?fuid=' + fuid + '&verify' + verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random(),
+		onload:function(o){;},//{GM_log("gxdWater done");},
+		onfaiure : function(o){GM_log("gxdWater fail");}
+	});
+}
