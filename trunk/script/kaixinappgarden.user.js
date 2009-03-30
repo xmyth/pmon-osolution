@@ -349,5 +349,18 @@ function gxdWater(fuid, farmNum) {
 	});
 }
 
-//gxdBegin();
-gxdShowButton();
+//gxdShowButton();
+
+
+//reload current webpage
+function ap_reload(){
+	location.href = location.href;
+}
+
+//reload this page every 10 minutes.
+var ms = 10*60*1000;
+window.setTimeout(ap_reload,ms);
+
+//start steal!!!!!!!!!
+gxdBegin();
+
