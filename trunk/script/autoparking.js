@@ -150,25 +150,20 @@ function ap_get_runningcar(){
 		}
 	}
 	var carlist = [];
-    var j = -1, gmoney = 0;
+
 	for(var i=0;i<v_userdata.car.length;i++){
 		var car = v_userdata.car[i];		
 		if(car.park_profit>profittomove){
-			//carlist.push(car);
-            if (car.park_profit > gmoney)
-            {
-                j = i;
-                gmoney = car.park_profit;
-            }
+			carlist.push(car);
             SetCookie("KaiXinParkMoney", 500);
 		}
 	}
-	if (j == -1)
+	if (carlist.length == 0)
     {
         SetCookie("KaiXinParkMoney", 4000);
 		return false;
     }
-	return v_userdata.car[j]; //carlist[Math.floor(Math.random()*carlist.length)];
+	return carlist[Math.floor(Math.random()*carlist.length)];
 }
 function ap_get_emptyfriend(){
 	var emptyfriends = [];
