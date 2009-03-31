@@ -286,14 +286,14 @@ function blinkNewMsg2(){
 	document.title = g_blinkswitch % 2 ? "【　　　　　】 - " + g_blinktitle : "【停车中勿扰】 - " + g_blinktitle;
 	g_blinkswitch++;
 }
-if(location.search=="?aid=1040&url=index.php"||location.search=="?aid=1040"||location.href.indexOf("~parking/index.php")>-1){
+if(location.search=="?aid=1040&url=index.php"||location.search=="?aid=1040"||location.href.indexOf("~parking/index.php")>-1||location.href.indexOf("!parking/index.php")>-1){
 	window.setTimeout(ap_init,5000);
 	
 	
 }
 var runningcar,emptyfriend,carport,callback,lastparkings,apwarning,profittomove=GetCookie("KaiXinParkMoney", 4000);
 
-if(location.search=="?aid=1040&url=index.php"||location.search=="?aid=1040"||location.href.indexOf("~parking/index.php")>-1){
+if(location.search=="?aid=1040&url=index.php"||location.search=="?aid=1040"||location.href.indexOf("~parking/index.php")>-1||location.href.indexOf("!parking/index.php")>-1){
 	//================add by cngmclub==============//
 	if(!window.cngm_scriptinfo){
 	window.cngm_scriptinfo = {};
