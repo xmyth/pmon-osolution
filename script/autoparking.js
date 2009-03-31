@@ -155,8 +155,8 @@ function ap_get_runningcar(){
 		var car = v_userdata.car[i];		
 		if(car.park_profit>profittomove){
 			carlist.push(car);
-            if (profittomove - 1000 > 500)
-                profittomove = profittomove - 1000;
+            if (profittomove / 2 > 500)
+                profittomove = profittomove / 2;
             else
                 profittomove = 500;
             SetCookie("KaiXinParkMoney", profittomove);
