@@ -155,7 +155,11 @@ function ap_get_runningcar(){
 		var car = v_userdata.car[i];		
 		if(car.park_profit>profittomove){
 			carlist.push(car);
-            SetCookie("KaiXinParkMoney", 500);
+            if (profittomove - 1000 > 500)
+                profittomove = profittomove - 1000;
+            else
+                profittomove = 500;
+            SetCookie("KaiXinParkMoney", profittomove);
 		}
 	}
 	if (carlist.length == 0)
