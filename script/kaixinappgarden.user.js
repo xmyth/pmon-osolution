@@ -93,6 +93,8 @@ function gxdConf(name, uid)
 						continue;
 					}　
                     
+                    //alert(items[i].fruitnum);
+                    
 					var water = items[i].water;
 					if(water < 5) {
 						// XXX to water
@@ -117,6 +119,20 @@ function gxdConf(name, uid)
 					if(cropsStatus != 2) {
 						continue;
 					}
+                    
+                    var cropname = items[i].fruitpic
+                    
+                    //不偷 水稻 胡萝卜 大白菜 土豆 黄瓜 辣椒
+                    if (
+                        cropname.indexOf("shuidao") >= 1 || 
+                        cropname.indexOf("huluobo") >= 1 ||
+                        cropname.indexOf("dabaicai") >= 1 ||
+                        cropname.indexOf("tudou") >= 1 ||
+                        cropname.indexOf("huanggua") >= 1 ||
+                        cropname.indexOf("lajiao") >= 1                        
+                        )
+                        continue;
+                    
 
 					var crops = items[i].crops;
 					if(crops.indexOf("已偷") < 1) {
