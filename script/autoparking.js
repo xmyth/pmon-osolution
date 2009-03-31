@@ -169,9 +169,20 @@ function ap_get_emptyfriend(){
 	var lastpartuid = lastparkings[runningcar.carid]
 	var scene = 0, j = -1;
     	for(var i=0;i<v_frienddata.length;i++){
-    		if(v_frienddata[i].full=="0"&&v_frienddata[i].uid!=lastpartuid && parseInt(v_frienddata[i]["scenemoney"]) > scene && v_frienddata[i].uid != "4515094"){
-			j = i;
-			scene = parseInt(v_frienddata[i]["scenemoney"]);
+    		if(v_frienddata[i].full=="0"&&v_frienddata[i].uid!=lastpartuid && v_frienddata[i].uid != "4515094"){
+                if (parseInt(v_frienddata[i]["scenemoney"]) > scene)
+                {
+        			j = i;
+        			scene = parseInt(v_frienddata[i]["scenemoney"]);
+                }
+                else if (parseInt(v_frienddata[i]["scenemoney"]) == scene)
+                {
+                    if (Math.random() > 0.5)
+                    {
+            			j = i;
+            			scene = parseInt(v_frienddata[i]["scenemoney"]);
+                    }
+                }
     		}
     	}
         if(j == -1){
