@@ -119,22 +119,48 @@ function gxdConf(name, uid)
 					if(cropsStatus != 2) {
 						continue;
 					}
-                    
-                    var cropname = items[i].fruitpic
-                    
-                    //不偷 水稻 胡萝卜 大白菜 土豆 黄瓜 辣椒
-                    if (
-                        cropname.indexOf("shuidao") >= 1 || 
-                        cropname.indexOf("huluobo") >= 1 ||
-                        cropname.indexOf("dabaicai") >= 1 ||
-                        cropname.indexOf("tudou") >= 1 ||
-                        cropname.indexOf("huanggua") >= 1 ||
-                        cropname.indexOf("lajiao") >= 1                        
-                        )
-                        continue;
-                    
 
+                    //产量
+                    var fruitnum = items[i].fruitnum;
+                    
 					var crops = items[i].crops;
+                    
+                    var pos1 = crops.indexOf("剩余");
+                    var pos2 = crops.indexOf("<br>", pos1);
+                    
+                    //剩余数量
+                    var leftnum = 0;
+                    
+                    if (pos1 > 0 && pos2 > 0 &&  pos2 > pos1 + 3)
+                    {
+                        leftnum = parseInt(crops.substring(pos1+3, pos2));
+                    }
+                    
+                    var myDate = new Date();
+                    var hour = myDate.getHours();
+                    
+                    //fruitnum == leftnum 表示所有植物是第一次被偷
+                    if (fruitnum != leftnum && hour < 20)
+                    {
+                        //一天20点之前只偷刚成熟的植物. 20点之后什么都偷,摆正可以偷满
+                        continue;
+                    }
+                    /*
+                        //如果不是第一次偷的话,这些就不偷了
+                        var cropname = items[i].fruitpic
+                        
+                        //不偷 水稻 胡萝卜 大白菜 土豆 黄瓜 辣椒
+                        if (
+                            cropname.indexOf("shuidao") >= 1 || 
+                            cropname.indexOf("huluobo") >= 1 ||
+                            cropname.indexOf("dabaicai") >= 1 ||
+                            cropname.indexOf("tudou") >= 1 ||
+                            cropname.indexOf("huanggua") >= 1 ||
+                            cropname.indexOf("lajiao") >= 1                        
+                            )
+                            continue;
+                            */          
+                                     
 					if(crops.indexOf("已偷") < 1) {
 						links.push({'name' : name, 'farmNum' : farmNum, 'fuid' : uid});
 						gxdBeginSteal();
