@@ -47,14 +47,10 @@ function gxdConf(uid)
 					var farmNum = items[i].farmnum;
 					//GM_log(farmNum);
 
-                    var cropsid = items[i].cropsid;
-					if(cropsid < 1) {
-						continue;
-					}
 					var water = items[i].water;
 					if(water < 5) {
 						// XXX to water
-                        GM_log(water + " " + uid);
+			                        GM_log(water + " " + uid);
 						gxdWater(uid, farmNum);
 					}
 				}
