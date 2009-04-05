@@ -23,7 +23,7 @@ function gxdConf(uid)
 {
 	var pp= Math.round((Math.random()) * 100000000);
 	var url = "/house/garden/friend_ajax.php";
-	var pars = "verify=" + g_verify + "&fuid="+fuid+"&r="+pp;
+	var pars = "verify=" + g_verify + "&fuid="+uid+"&r="+pp;
 	var myAjax = new Ajax.Request(url, {method: "post", parameters: pars, onComplete: function(o) {
 			var txt = o.responseText;
 			// 没有安装该应用
