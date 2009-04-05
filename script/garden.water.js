@@ -27,8 +27,12 @@ function gxdConf(uid)
 	var myAjax = new Ajax.Request(url, {method: "get", parameters: pars, onComplete: function(o) {
 			var txt = o.responseText;
 			// 没有安装该应用
+			
+			GM_log(txt);
+			
+			return;
+						
 			if(txt.substr(0, 5).replace(/(\s*)/,"") != "<conf") {
-				alert("Error!");
 				return;
 			}
 			// 去掉某些不可见字符。
