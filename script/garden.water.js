@@ -24,10 +24,11 @@ function gxdConf(uid)
 	var pp= Math.round((Math.random()) * 100000000);
 	var url = "/house/garden/friend_ajax.php";
 	var pars = "verify=" + g_verify + "&fuid="+uid+"&r="+pp;
-	var myAjax = new Ajax.Request(url, {method: "post", parameters: pars, onComplete: function(o) {
+	var myAjax = new Ajax.Request(url, {method: "get", parameters: pars, onComplete: function(o) {
 			var txt = o.responseText;
 			// 没有安装该应用
 			if(txt.substr(0, 5).replace(/(\s*)/,"") != "<conf") {
+				alert("Error!");
 				return;
 			}
 			// 去掉某些不可见字符。
