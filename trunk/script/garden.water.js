@@ -22,7 +22,7 @@ function searchFriend()
 function gxdConf(uid) 
 {
 	var pp= Math.round((Math.random()) * 100000000);
-	var url = "/house/garden/friend_ajax.php";
+	var url = conf_url;
 	var pars = "verify=" + g_verify + "&fuid="+uid+"&r="+pp;
 	var myAjax = new Ajax.Request(url, {method: "get", parameters: pars, onComplete: function(o) {
 			var txt = o.responseText;
