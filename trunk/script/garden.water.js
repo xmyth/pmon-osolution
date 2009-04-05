@@ -28,7 +28,7 @@ function gxdConf(uid)
 			var txt = o.responseText;
 			// 没有安装该应用
 			
-			GM_log(txt);
+			alert(txt);
 			
 			return;
 						
