@@ -68,5 +68,5 @@ function gxdWater(fuid, farmNum) {
     //alert(weburl);
 	new Ajax.Request(water_url, {method: "get", parameters: pars, onComplete: function(o) {
 		alert(o.responseText);
-	}
+	}});
 }
