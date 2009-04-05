@@ -6,6 +6,7 @@
 // ==/UserScript==
 
 var conf_url = 'http://www.kaixin001.com/house/garden/getconf.php';
+var water_url = 'http://www.kaixin001.com/house/garden/water.php';
 
 searchFriend();
 
@@ -41,7 +42,6 @@ function gxdConf(uid)
 				var xml = xml2array(doc);
 				var items = xml.conf.garden.item;
 				var name = xml.conf.account.name
-				//var_dump(xml);
 
 				for(var i in items) {
 					var farmNum = items[i].farmnum;
@@ -63,14 +63,10 @@ function gxdConf(uid)
 }
 
 function gxdWater(fuid, farmNum) {
-    //weburl = water_url + '?fuid=' + fuid + '&verify' + verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random();
+    	pars = 'fuid=' + fuid + '&verify' + verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random();
     
     //alert(weburl);
-
-	GM_xmlhttpRequest({
-		method : 'GET',
-		url : water_url + '?fuid=' + fuid + '&verify' + g_verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random(),
-		onload:function(o){;},//{GM_log("gxdWater done");},
-		onfaiure : function(o){GM_log("gxdWater fail");}
-	});
+	new Ajax.Request(water_url, {method: "get", parameters: pars, onComplete: function(o) {
+		alert(o.responseText);
+	}
 }
