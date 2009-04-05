@@ -9,6 +9,57 @@ var conf_url = 'http://www.kaixin001.com/house/garden/getconf.php';
 
 searchFriend();
 
+if(GM_xmlhttpRequest === "undefined") {
+	alert("GM_xmlhttpRequest");
+	GM_xmlhttpRequest = function(/* object */ details) {
+		details.method = details.method.toUpperCase() || "GET";
+		
+		if(!details.url) {
+			throw("GM_xmlhttpRequest requires an URL.");
+			return;
+		}
+		
+		// build XMLHttpRequest object
+		var oXhr, aAjaxes = [];
+		if(typeof ActiveXObject !== "undefined") {
+			var oCls = ActiveXObject;
+			aAjaxes[aAjaxes.length] = {cls:oCls, arg:"Microsoft.XMLHTTP"};
+			aAjaxes[aAjaxes.length] = {cls:oCls, arg:"Msxml2.XMLHTTP"};
+			aAjaxes[aAjaxes.length] = {cls:oCls, arg:"Msxml2.XMLHTTP.3.0"};
+		}
+		if(typeof XMLHttpRequest !== "undefined")
+			 aAjaxes[aAjaxes.length] = {cls:XMLHttpRequest, arg:undefined};
+	
+		for(var i=aAjaxes.length; i--; )
+			try{
+				oXhr = new aAjaxes[i].cls(aAjaxes[i].arg);
+				if(oXhr) break;
+			} catch(e) {}
+		
+		// run it
+		if(oXhr) {
+			if("onreadystatechange" in details)
+				oXhr.onreadystatechange = function() { details.onreadystatechange(oXhr) };
+			if("onload" in details)
+				oXhr.onload = function() { details.onload(oXhr) };
+			if("onerror" in details)
+				oXhr.onerror = function() { details.onerror(oXhr) };
+			
+			oXhr.open(details.method, details.url, true);
+			
+			if("headers" in details)
+				for(var header in details.headers)
+					oXhr.setRequestHeader(header, details.headers[header]);
+			
+			if("data" in details)
+				oXhr.send(details.data);
+			else
+				oXhr.send();
+		} else
+			throw ("This Browser is not supported, please upgrade.")
+	}
+}
+
 function searchFriend()
 {
     gotoLFriend();
