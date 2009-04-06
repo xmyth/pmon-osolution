@@ -12,7 +12,8 @@ var vermin_url = 'http://www.kaixin001.com/house/garden/antivermin.php';
 
 searchFriend();
 
-var farnum = 1
+var farnum = 1;
+var msgDiv = 0;
 
 function searchFriend()
 {
@@ -31,46 +32,52 @@ function mengJob(uid)
 	var pars = "verify=" + g_verify + "&fuid="+uid+"&r="+pp;
 	var myAjax = new Ajax.Request(url, {method: "get", parameters: pars, onComplete: function(o) {
 			var txt = o.responseText;
-			// Ã»ÓÐ°²×°¸ÃÓ¦ÓÃ
+			// æ²¡æœ‰å®‰è£…è¯¥åº”ç”¨
 						
 			if(txt.substr(0, 5).replace(/(\s*)/,"") != "<conf") {
 				alert(txt);
 				return;
 			}
-			// È¥µôÄ³Ð©²»¿É¼û×Ö·û¡£
+			// åŽ»æŽ‰æŸäº›ä¸å¯è§å­—ç¬¦ã€‚
 			txt = txt.replace(/<steal>(.*)<\/steal>/,"");
 
 			var docParser = new DOMParser();
 			try {
 				var doc = docParser.parseFromString(txt,"application/xml");
-				// ÊÇ·ñÓÐ¿ª¿Ñ
-				var status = doc.getElementsByTagName("status");
-				// ÊÇ·ñÐèÒª½½Ë®
-				var water = doc.getElementsByTagName("water");
-				// ÊÇ·ñÓÐÔÓ²Ý				
-				var grass = doc.getElementsByTagName("grass");
-				// ÊÇ·ñÓÐº¦³æ
-				var vermin = doc.getElementsByTagName("vermin");
+				
+				var xml = xml2array(doc);
+				
+				var items = xml.conf.garden.item;
+				
+				var name = xml.conf.account.name
+				
+				mengShowMsg("æ£€æŸ¥ " + name);
 
-
-				// <account>±êÇ©ÇøÓòÃ»ÓÐ<status>, ËùÒÔÐèÒª+1. <account>ÇøÓòµÄ<water> <grass> Ó¦¸Ãskip
-				for (var i = 1; i < status.length + 1; i++)
-				{
-					// 1 ±íÊ¾Õâ¿éµØ±»¿ª¿ÑÁË
-					if (status[i - 1].childNodes[0].nodeValue != 1)
+				for(var i in items) {
+					
+					var status = items[i].status;
+					
+					var water = items[i].water;
+					
+					var grass = items[i].grass;
+					
+					var vermin = items[i].vermin;
+					
+					// 1 è¡¨ç¤ºè¿™å—åœ°è¢«å¼€åž¦äº†
+					if (status != 1)
 						continue;
 						
-					// ½½Ë®
-					if (water[i].childNodes[0].nodeValue < 5)
-						mengWater(uid, i);
+					// æµ‡æ°´
+					if (water < 5)
+						mengWater(uid, i, name);
 					
-					// ³ý²Ý
-					if (grass[i - 1].childNodes[0].nodeValue < 5)
-						mengGrass(uid, i);
+					// é™¤è‰
+					if (grass != 0)
+						mengGrass(uid, i, name);
 						
-					// ³ý³æ
-					if (vermin[i].childNodes[0].nodeValue < 5)
-						mengVermin(uid, i);
+					// é™¤è™«
+					if (vermin != 0)
+						mengVermin(uid, i, name);
 				}
 				
 
@@ -82,31 +89,31 @@ function mengJob(uid)
 		}});
 }
 
-function mengWater(fuid, farmNum) {
+function mengWater(fuid, farmNum, name) {
     	pars = 'fuid=' + fuid + '&verify=' + g_verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random();
 
 	new Ajax.Request(water_url, {method: "get", parameters: pars, onComplete: function(o) {
-		//alert(o.responseText);
+		mengShowMsg(name + " æµ‡æ°´ " + o.responseText);
 	}});
 	
 }
 
 
-function mengGrass(fuid, farmNum) {
+function mengGrass(fuid, farmNum, name) {
     	pars = 'fuid=' + fuid + '&verify=' + g_verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random();
 
 	new Ajax.Request(grass_url, {method: "get", parameters: pars, onComplete: function(o) {
-		//alert(o.responseText);
+		mengShowMsg(name + " é™¤è‰ " + o.responseText);
 	}});
 	
 }
 
 
-function mengVermin(fuid, farmNum) {
+function mengVermin(fuid, farmNum, name) {
     	pars = 'fuid=' + fuid + '&verify=' + g_verify + '&seedid=0&farmnum=' +farmNum + '&r=' + Math.random();
 
 	new Ajax.Request(vermin_url, {method: "get", parameters: pars, onComplete: function(o) {
-		//alert(o.responseText);
+		mengShowMsg(name + " é™¤è™« " + o.responseText);
 	}});
 	
 }
@@ -120,7 +127,7 @@ function mengShowMsg(msg) {
 		x.innerHTML += "<div class='title'></div><div class='body' id='m-msg'></div><div class='footer'></div>";
 		document.body.appendChild(x);
 		msgDiv = document.getElementById("m-msg");
-		msgDiv.innerHTML = "??:<br/>";
+		msgDiv.innerHTML = "ç»“æžœ:<br/>";
 	}
 	msgDiv.innerHTML += msg + "<br/>";
 }
@@ -234,3 +241,4 @@ function xml2array(xmlDoc,parent_count) {
 	}
 	return arr;
 }
+
